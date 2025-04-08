@@ -35,7 +35,7 @@ export default function HomePage() {
     };
 
     fetchBDP();
-  }, []);
+  }, [token]);
 
   return (
     <div className="space-y-16">
