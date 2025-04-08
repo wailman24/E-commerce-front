@@ -44,6 +44,7 @@ export function LoginForm({ handlelogin }: LoginFormProps) {
         setError(result.error); // Set error message
       } else {
         console.log("Login successful", result);
+
         // Redirect or perform any success action
       }
     } catch (err) {

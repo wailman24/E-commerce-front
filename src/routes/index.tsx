@@ -1,11 +1,14 @@
 //import React from "react";
 //import { Home } from "lucide-react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Login from "../pages/auth/login";
 import Signup from "../pages/auth/signup";
 import Home from "../pages/home";
 import { useContext } from "react";
 import { AppContext } from "../Context/AppContext";
+import MainLayout from "../layouts/MainLayout";
+
+//import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
 
@@ -17,9 +20,23 @@ function AppRoutes() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={user ? <Home /> : <Login />} />
-        <Route path="/signup" element={user ? <Home /> : <Signup />} />
+        {!user && (
+          <>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </>
+        )}
+        {user && (
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<Home />} />
+            {/* Add more protected routes here */}
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Route>
+        )}
+
+        {/*  <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </>
   );
