@@ -1,9 +1,9 @@
 //import React from "react";
 import { Eye, ShoppingCart, Heart } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Button } from "../../components/ui/button";
 import { useContext, useEffect, useState } from "react";
-import { getbestdealsproducts, product } from "../services/home/product";
-import { AppContext } from "../Context/AppContext";
+import { getbestdealsproducts, product } from "../../services/home/product";
+import { AppContext } from "../../Context/AppContext";
 
 export default function HomePage() {
   const appContext = useContext(AppContext);
@@ -82,53 +82,54 @@ export default function HomePage() {
       </section>
 
       {/* Best Deals */}
-      <section className="px-6">
-        <h2 className="text-2xl font-bold mb-6">Best Deals {error}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {bdproducts.map((product) => {
-            console.log(
-              "Product image:",
-              product.images?.[0]?.image_url,
-              " product_name",
-              product.name,
-              "image_count:",
-              product.images?.length
-            ); // Debugging product image data
-            return (
-              <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-0 overflow-hidden text-left">
-                <div className="relative">
-                  {/*  <img
-                    // Fix the <img> tag code:
-                    src={product.image?.length > 0 ? `http://localhost:8000/storage/${product.image[0].image_url}` : "123"}
+      <section className="px-6 py-4">
+        <h2 className="text-2xl font-bold mb-6">Best Deals {error && `- ${error}`}</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {bdproducts.map((product) => (
+            <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden text-left">
+              {/* Product Image with Actions */}
+              <div className="relative w-full h-40">
+                {product.images?.[0]?.image_url && (
+                  <img
+                    src={`http://127.0.0.1:8000/storage/${product.images[0].image_url}`}
                     alt={product.name}
-                    className="w-full h-40 object-cover"
-                  /> */}
-                  {product.images?.[0]?.image_url && (
-                    <img
-                      src={`http://127.0.0.1:8000/storage/${product.images[0].image_url}`}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                  <div className="absolute top-2 right-2 flex gap-2">
-                    <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
-                      <Heart className="w-4 h-4 text-gray-700" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
-                      <Eye className="w-4 h-4 text-gray-700" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="p-3 space-y-1">
-                  <p className="font-medium text-sm truncate">{product.name}</p>
-                  <p className="text-gray-500 text-sm">{product.prix} DZD</p>
-                  <Button variant="outline" className="w-full mt-2 text-sm flex items-center justify-center gap-2">
-                    <ShoppingCart className="w-4 h-4" /> Add to Cart
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                <div className="absolute top-2 right-2 flex flex-col gap-2">
+                  <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
+                    <Heart className="w-4 h-4 text-gray-700" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
+                    <Eye className="w-4 h-4 text-gray-700" />
                   </Button>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Product Details */}
+              <div className="p-3 space-y-1">
+                <p className="text-xs text-blue-600">{"Brand Ltd"}</p>
+                <p className="font-medium text-sm truncate">{product.name}</p>
+
+                {/* Rating */}
+                <div className="flex text-yellow-500 text-sm">{"★".repeat(0).padEnd(5, "☆")}</div>
+
+                {/* Pricing */}
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-semibold">{product.prix} DZD</span>
+                  {product.prix && <span className="line-through text-gray-400 text-xs">{product.prix} DZD</span>}
+                </div>
+
+                {/* Sold Count */}
+                <p className="text-green-600 text-xs">{product.total_sold || 0} sold</p>
+
+                {/* Add to Cart */}
+                <Button variant="outline" className="w-full mt-2 text-sm flex items-center justify-center gap-2">
+                  <ShoppingCart className="w-4 h-4" /> Add to Cart
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>

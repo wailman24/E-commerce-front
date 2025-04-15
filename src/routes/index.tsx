@@ -3,10 +3,11 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import Login from "../pages/auth/login";
 import Signup from "../pages/auth/signup";
-import Home from "../pages/home";
+import Home from "../pages/main/home";
 import { useContext } from "react";
 import { AppContext } from "../Context/AppContext";
 import MainLayout from "../layouts/MainLayout";
+import Products from "../pages/main/products";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -31,6 +32,7 @@ function AppRoutes() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/products" element={<Products />} />
             {/* Add more protected routes here */}
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>

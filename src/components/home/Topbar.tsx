@@ -12,17 +12,11 @@ const Topbar = () => {
         </Link>
 
         {/* Search */}
-        <input
-          type="text"
-          placeholder="Search Product..."
-          className="w-1/2 px-4 py-2 border rounded-full outline-none"
-        />
+        <input type="text" placeholder="Search Product..." className="w-1/2 px-4 py-2 border rounded-full outline-none" />
 
         {/* Become Seller */}
         <Link to="/become-seller">
-          <button className="bg-black text-white px-4 py-2 rounded-full text-sm">
-            Become Seller
-          </button>
+          <button className="bg-black text-white px-4 py-2 rounded-full text-sm">Become Seller</button>
         </Link>
       </div>
 
@@ -49,11 +43,6 @@ const Topbar = () => {
             <li>
               <Link to="/products" className="hover:text-green-300">
                 Products
-              </Link>
-            </li>
-            <li>
-              <Link to="/events" className="hover:text-green-300">
-                Events
               </Link>
             </li>
             <li>
