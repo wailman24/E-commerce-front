@@ -1,6 +1,18 @@
 import { Heart, Eye, ShoppingCart } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { product } from "../../services/home/product";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../../components/ui/sheet";
 
 export default function Prodcards({ id, name, images, prix, total_sold }: product) {
   return (
@@ -23,7 +35,6 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
 
         {/* Product Details */}
         <div className="p-3 space-y-1">
-          <p className="text-xs text-blue-600">{"Brand Ltd"}</p>
           <p className="font-medium text-sm truncate">{name}</p>
 
           {/* Rating */}
@@ -32,16 +43,44 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
           {/* Pricing */}
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold">{prix} DZD</span>
-            {prix && <span className="line-through text-gray-400 text-xs">{prix} DZD</span>}
           </div>
 
           {/* Sold Count */}
           <p className="text-green-600 text-xs">{total_sold || 0} sold</p>
 
-          {/* Add to Cart */}
-          <Button variant="outline" className="w-full mt-2 text-sm flex items-center justify-center gap-2">
-            <ShoppingCart className="w-4 h-4" /> Add to Cart
-          </Button>
+          {/* Add to Cart Sheet */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full mt-2 text-sm flex items-center justify-center gap-2">
+                <ShoppingCart className="w-4 h-4" /> Add to Cart
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Add to Cart</SheetTitle>
+                <SheetDescription>Select quantity and confirm.</SheetDescription>
+              </SheetHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Product
+                  </Label>
+                  <Input id="name" value={name} className="col-span-3" readOnly />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="qty" className="text-right">
+                    Quantity
+                  </Label>
+                  <Input id="qty" type="number" min={1} defaultValue={1} className="col-span-3" />
+                </div>
+              </div>
+              <SheetFooter>
+                <SheetClose asChild>
+                  <Button type="submit">Confirm</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </>
