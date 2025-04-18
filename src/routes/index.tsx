@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AppContext } from "../Context/AppContext";
 import MainLayout from "../layouts/MainLayout";
 import Products from "../pages/main/products";
+import ShoppingCartPage from "../pages/main/shoppingcarts";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -33,6 +34,7 @@ function AppRoutes() {
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/home" element={<Home />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/cart" element={<ShoppingCartPage />} />
             {/* Add more protected routes here */}
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>

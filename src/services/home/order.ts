@@ -1,33 +1,31 @@
-export interface product {
-  id: number;
-  name: string;
-  category_id?: number;
-  about?: string;
-  prix: number;
-  stock?: number;
-  is_valid?: number;
-  seller_id?: number;
+import { product } from "./product";
+export interface order {
+  id?: number;
+  user_id?: number;
+  adress_delivery?: string;
+  total: number;
+  status: string;
+  is_done: boolean;
   created_at?: string;
   updated_at?: string;
-  total_sold: string;
-  images: {
-    id?: number;
-    image_url: string;
-    is_main?: number;
-    product_id?: number;
-    created_at?: string;
-    updated_at?: string;
-  }[];
-  rating: number;
 }
-export async function getbestdealsproducts(token: string | null): Promise<product[] | { error: string }> {
+export interface item {
+  id?: number;
+  product: product;
+  order?: order;
+  qte: number;
+  price: number;
+}
+
+export async function addorderitem(token: string | null, dataitem: { product_id: number }): Promise<item | { error: string }> {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/getBestDealsProducts", {
-      method: "GET",
+    const res = await fetch("http://127.0.0.1:8000/api/order_item", {
+      method: "post",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(dataitem),
     });
     if (!res.ok) {
       const error = await res.json();
@@ -41,11 +39,10 @@ export async function getbestdealsproducts(token: string | null): Promise<produc
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
-
-export async function getallvalidproducts(token: string | null): Promise<product[] | { error: string }> {
+export async function getorderitems(token: string | null): Promise<item[] | { error: string }> {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/getvalidproducts", {
-      method: "GET",
+    const res = await fetch("http://127.0.0.1:8000/api/order_item", {
+      method: "get",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
