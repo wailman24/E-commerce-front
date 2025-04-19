@@ -1,7 +1,7 @@
 export interface product {
   id: number;
   name: string;
-  category_id?: number;
+  category?: string;
   about?: string;
   prix: number;
   stock?: number;
@@ -18,6 +18,7 @@ export interface product {
     created_at?: string;
     updated_at?: string;
   }[];
+  reviewcount: number;
   rating: number;
 }
 export async function getbestdealsproducts(token: string | null): Promise<product[] | { error: string }> {

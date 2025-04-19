@@ -39,6 +39,7 @@ export async function addorderitem(token: string | null, dataitem: { product_id:
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+
 export async function getorderitems(token: string | null): Promise<item[] | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/order_item", {
@@ -48,6 +49,73 @@ export async function getorderitems(token: string | null): Promise<item[] | { er
         "Content-Type": "application/json",
       },
     });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch best deal products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function inc(token: string | null, order_item: number): Promise<item | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/inc/${order_item}`, {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch best deal products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during registration:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function dec(token: string | null, order_item: number): Promise<item | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/dec/${order_item}`, {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch best deal products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during registration:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function deleteitem(token: string | null, order_item: number): Promise<item | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/order_item/${order_item}`, {
+      method: "delete",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
     if (!res.ok) {
       const error = await res.json();
       return { error: error.message || "Failed to fetch best deal products." };
