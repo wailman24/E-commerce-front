@@ -14,8 +14,9 @@ import {
   SheetTrigger,
 } from "../../components/ui/sheet"; */
 import { addorderitem } from "../../services/home/order";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../Context/AppContext";
+import { addtowishlist, isexist } from "../../services/home/wishlist";
 
 export default function Prodcards({ id, name, images, prix, total_sold }: product) {
   const appContext = useContext(AppContext);
@@ -23,7 +24,7 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
 
   const { token } = appContext;
   const [error, setError] = useState<string | null>(null);
-  //const [product_id, setProdid] = useState("");
+  const [exist, setExist] = useState(false);
 
   const handleAddToCart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +46,51 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
     }
   };
 
+  const handleAddTowishlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(""); // Reset previous error
+
+    try {
+      const response = await addtowishlist(token, { product_id: id });
+
+      if ("error" in response) {
+        console.log(error);
+        setError(response.error);
+      } else {
+        console.log(response);
+        setError(null);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
+  };
+
+  const handleexistinwishlist = async () => {
+    setError(""); // Reset previous error
+
+    try {
+      const response = await isexist(token, id);
+
+      if ("error" in response) {
+        console.log(error);
+        setError(response.error);
+        setExist(false);
+      } else {
+        console.log(response);
+        setError(null);
+        setExist(true);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    handleexistinwishlist();
+  }, []);
+
   return (
     <>
       <div key={id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden text-left">
@@ -54,8 +100,8 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
             <img src={`http://127.0.0.1:8000/storage/${images[0].image_url}`} alt={name} className="w-full h-full object-cover" />
           )}
           <div className="absolute top-2 right-2 flex flex-col gap-2">
-            <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
-              <Heart className="w-4 h-4 text-gray-700" />
+            <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8" onClick={handleAddTowishlist}>
+              <Heart className={`w-4 h-4 text-gray-700 ${exist ? "fill-red-500" : ""}`} />
             </Button>
             <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
               <Eye className="w-4 h-4 text-gray-700" />

@@ -9,6 +9,7 @@ import { AppContext } from "../Context/AppContext";
 import MainLayout from "../layouts/MainLayout";
 import Products from "../pages/main/products";
 import ShoppingCartPage from "../pages/main/shoppingcarts";
+import Wishlist from "../pages/main/wishlist";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -35,6 +36,7 @@ function AppRoutes() {
             <Route path="/home" element={<Home />} />
             <Route path="/products" element={<Products />} />
             <Route path="/cart" element={<ShoppingCartPage />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             {/* Add more protected routes here */}
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>
