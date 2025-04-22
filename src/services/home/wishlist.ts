@@ -56,7 +56,7 @@ export async function addtowishlist(token: string | null, dataitem: { product_id
   }
 }
 
-export async function isexist(token: string | null, product_id: number): Promise<wishlist[] | { error: string }> {
+export async function isexist(token: string | null, product_id: number): Promise<{ exists: boolean } | { error: string }> {
   try {
     const res = await fetch(`http://127.0.0.1:8000/api/existinwishlist/${product_id}`, {
       method: "GET",
@@ -70,9 +70,12 @@ export async function isexist(token: string | null, product_id: number): Promise
       return { error: error.message || "Failed to fetch best deal products." };
     }
 
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
+    if (!data) return { error: "Empty response from server." };
 
-    return data.data;
+    return { exists: data.exists };
+
+    //return data.data;
   } catch (error) {
     console.error("Error during registration:", error);
     return { error: "An unexpected error occurred. Please try again later." };

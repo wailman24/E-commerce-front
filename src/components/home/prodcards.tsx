@@ -65,31 +65,29 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
       console.error(err);
     }
   };
-
-  const handleexistinwishlist = async () => {
-    setError(""); // Reset previous error
-
-    try {
-      const response = await isexist(token, id);
-
-      if ("error" in response) {
-        console.log(error);
-        setError(response.error);
-        setExist(false);
-      } else {
-        console.log(response);
-        setError(null);
-        setExist(true);
-      }
-    } catch (err) {
-      setError("An unexpected error occurred.");
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
+    const handleexistinwishlist = async () => {
+      setError(""); // Reset previous error
+
+      try {
+        const response = await isexist(token, id);
+
+        if (response && "error" in response) {
+          console.log(response.error);
+          setError(response.error);
+          setExist(false);
+        } else if ("exists" in response) {
+          setExist(response.exists); // ✅ actually use the value returned
+          setError(null);
+        }
+      } catch (err) {
+        setError("An unexpected error occurred.");
+        console.error(err);
+      }
+    };
+
     handleexistinwishlist();
-  }, []);
+  }, [token, id]);
 
   return (
     <>
@@ -101,7 +99,7 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
           )}
           <div className="absolute top-2 right-2 flex flex-col gap-2">
             <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8" onClick={handleAddTowishlist}>
-              <Heart className={`w-4 h-4 text-gray-700 ${exist ? "fill-red-500" : ""}`} />
+              <Heart className={`w-4 h-4 text-gray-700 ${exist ? "fill-red-500 text-red-500" : ""}`} />
             </Button>
             <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
               <Eye className="w-4 h-4 text-gray-700" />
