@@ -17,10 +17,12 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [minRating, setMinRating] = useState<number>(0);
   const [availableOnly, setAvailableOnly] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchVP = async () => {
       try {
+        setLoading(true);
         const response = await getallvalidproducts(token);
         if ("error" in response) {
           setError(response.error);
@@ -32,6 +34,8 @@ export default function Products() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -101,17 +105,23 @@ export default function Products() {
         </div>
 
         {/* Products Grid */}
-        <div className="w-full sm:w-3/4">
-          {filteredProducts.length === 0 ? (
-            <p>No products match your filters.</p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
-              {filteredProducts.map((product) => (
-                <Prodcards key={product.id} {...product} />
-              ))}
-            </div>
-          )}
-        </div>
+        {loading ? (
+          <h1>loader</h1>
+        ) : (
+          <div className="w-full sm:w-3/4">
+            {filteredProducts.length === 0 ? (
+              <p>No products match your filters.</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+                <>
+                  {filteredProducts.map((product) => (
+                    <Prodcards key={product.id} {...product} />
+                  ))}
+                </>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

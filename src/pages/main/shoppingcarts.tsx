@@ -45,12 +45,10 @@ export default function ShoppingCartPage() {
     try {
       const response = await inc(token, order_item);
 
-      
-
       if ("error" in response) {
         console.log(error);
         setError(response.error);
-      } else {  
+      } else {
         setItems((prevItems) =>
           prevItems.map((item) =>
             item.id === order_item ? { ...item, qte: item.qte + 1, price: Number(item.price) + Number(item.product.prix) } : item
