@@ -7,7 +7,7 @@ export default function ShoppingCartPage() {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { token } = appContext;
+  const { token, setCartCount, cartCount } = appContext;
   const [items, setItems] = useState<item[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [paymentotal, setPaymentotal] = useState<number>();
@@ -103,8 +103,8 @@ export default function ShoppingCartPage() {
       } else {
         //Keep all items except the one whose id matches the deleted item's id.
         setItems((prevItems) => prevItems.filter((item) => item.id !== order_item));
-
         setPaymentotal(response.order?.total);
+        setCartCount(cartCount - 1);
         console.log(response);
         setError(null);
       }

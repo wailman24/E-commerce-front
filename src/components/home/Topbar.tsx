@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, Heart, User } from "lucide-react";
+import { HeartIcon, User, ShoppingCartIcon } from "lucide-react";
 import CategoryDropdown from "../ui/CategoryDropdown";
+import { useContext } from "react";
+import { AppContext } from "../../Context/AppContext";
 const Topbar = () => {
+  const appContext = useContext(AppContext);
+  if (!appContext) throw new Error("Products must be used within an AppProvider");
+
+  const { wishlistCount, cartCount } = appContext;
+  console.log(wishlistCount);
   return (
     <header className="shadow">
       {/* Top White Bar */}
@@ -56,10 +63,24 @@ const Topbar = () => {
         {/* Right: Icons */}
         <div className="flex items-center gap-4">
           <Link to="/wishlist">
-            <Heart className="hover:text-green-300" />
+            <div className="relative">
+              <HeartIcon className="text-white w-6 h-6" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {wishlistCount}
+                </span>
+              )}
+            </div>
           </Link>
           <Link to="/cart">
-            <ShoppingCart className="hover:text-green-300" />
+            <div className="relative ml-4">
+              <ShoppingCartIcon className="text-white w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </div>
           </Link>
           <Link to="/profile">
             <User className="hover:text-green-300" />

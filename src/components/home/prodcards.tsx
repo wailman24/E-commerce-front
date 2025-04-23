@@ -22,7 +22,7 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { token } = appContext;
+  const { token, setWishlistCount, wishlistCount, setCartCount, cartCount } = appContext;
   const [error, setError] = useState<string | null>(null);
   const [exist, setExist] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -39,6 +39,7 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
         setError(response.error);
       } else {
         console.log(response);
+        setCartCount(cartCount + 1);
         setError(null);
       }
     } catch (err) {
@@ -53,15 +54,25 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
 
     const newState = !exist;
     setExist(newState);
+    if (!exist) {
+      const newcount = wishlistCount + 1;
+      setWishlistCount(newcount);
+    } else {
+      const newcount = wishlistCount - 1;
+      setWishlistCount(newcount);
+    }
+
     try {
       const response = await addtowishlist(token, { product_id: id });
 
       if ("error" in response) {
         console.log(error);
         setExist(newState);
+        //setWishlistCount((count) => newState ? count - 1 : count + 1);
         setError(response.error);
       } else {
         console.log(response);
+
         setError(null);
       }
     } catch (err) {

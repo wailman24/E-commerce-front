@@ -2,10 +2,16 @@
 import { user } from "@/pages/auth/signup";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { getuser } from "../services/Auth/auth";
+import { getwishlist } from "../services/home/wishlist";
+import { getorderitems } from "../services/home/order";
 interface AppContextType {
   user: user | null;
   token: string | null;
   setToken: (token: string | null) => void;
+  wishlistCount: number;
+  setWishlistCount: (wishlistCount: number) => void;
+  cartCount: number;
+  setCartCount: (cartCount: number) => void;
   //setUser: (user: string) => void;
 }
 export const AppContext = createContext<AppContextType | null>(null);
@@ -17,9 +23,9 @@ export default function AppProvider({ children }: { children: ReactNode }) {
     password: "",
     role: "",
   });
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
+  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [wishlistCount, setWishlistCount] = useState<number>(0);
+  const [cartCount, setCartCount] = useState<number>(0);
   //getuser(token);
 
   useEffect(() => {
@@ -45,8 +51,21 @@ export default function AppProvider({ children }: { children: ReactNode }) {
 
     fetchuser();
   }, [token]);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const wishlist = await getwishlist(token);
+
+      if (!("error" in wishlist)) setWishlistCount(wishlist.length);
+
+      const cart = await getorderitems(token);
+      if (!("error" in cart)) setCartCount(cart.length);
+    };
+
+    fetchCounts();
+  }, [token]);
   return (
-    <AppContext.Provider value={{ token, setToken, user }}>
+    <AppContext.Provider value={{ token, setToken, user, wishlistCount, setWishlistCount, cartCount, setCartCount }}>
       {children}
     </AppContext.Provider>
   );

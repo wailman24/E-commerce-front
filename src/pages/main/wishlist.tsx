@@ -21,6 +21,7 @@ export default function Products() {
           setProducts([]);
         } else {
           setProducts(response);
+
           console.log(response);
           setError(null);
         }
