@@ -2,12 +2,13 @@ import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../../Context/AppContext";
 import { Button } from "../../components/ui/button";
 import { getorderitems, item, inc, dec, deleteitem } from "../../services/home/order";
+import { addtowishlist, isexist } from "../../services/home/wishlist";
 
 export default function ShoppingCartPage() {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { token, setCartCount, cartCount } = appContext;
+  const { token, setCartCount, cartCount, setWishlistCount, wishlistCount } = appContext;
   const [items, setItems] = useState<item[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [paymentotal, setPaymentotal] = useState<number>();
@@ -113,6 +114,41 @@ export default function ShoppingCartPage() {
       console.error(err);
     }
   };
+
+  const handleMovetoWishlist = async (e: React.FormEvent, product_id: number) => {
+    e.preventDefault();
+    setError(""); // Reset previous error
+
+    try {
+      const result = await isexist(token, product_id);
+      if ("error" in result) {
+        console.log(result.error);
+        setError(result.error);
+        return;
+      }
+
+      if (!result.exists) {
+        //handleDelete(e, order_item);
+        //setCartCount(cartCount - 1);
+        setWishlistCount(wishlistCount + 1);
+        const response = await addtowishlist(token, { product_id });
+
+        if ("error" in response) {
+          console.log(error);
+          setError(response.error);
+        } else {
+          //setItems((prevItems) => prevItems.filter((item) => item.product.id !== product_id));
+          console.log(response);
+          setError(null);
+        }
+      } else {
+        console.log("this product is already in the wishlist");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
+  };
   return (
     <div className="flex flex-col md:flex-row justify-between gap-8 p-6 md:p-10">
       {/* Left section - Items */}
@@ -156,7 +192,7 @@ export default function ShoppingCartPage() {
                     <Button variant="link" className="text-blue-700 px-0" onClick={(e) => handleDelete(e, item.id!)}>
                       Remove
                     </Button>
-                    <Button variant="link" className="text-blue-700 px-0">
+                    <Button variant="link" className="text-blue-700 px-0" onClick={(e) => handleMovetoWishlist(e, item.product.id)}>
                       Move to Wishlist
                     </Button>
                   </div>

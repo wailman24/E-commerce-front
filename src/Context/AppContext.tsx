@@ -25,7 +25,7 @@ export default function AppProvider({ children }: { children: ReactNode }) {
   });
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [wishlistCount, setWishlistCount] = useState<number>(0);
-  const [cartCount, setCartCount] = useState<number>(0);
+  const [cartCount, setCartCount] = useState(0);
   //getuser(token);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function AppProvider({ children }: { children: ReactNode }) {
       if (!("error" in wishlist)) setWishlistCount(wishlist.length);
 
       const cart = await getorderitems(token);
-      if (!("error" in cart)) setCartCount(cart.length);
+      if (cart && !("error" in cart)) setCartCount(cart.length);
     };
 
     fetchCounts();

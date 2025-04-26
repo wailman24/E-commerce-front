@@ -67,7 +67,7 @@ export async function isexist(token: string | null, product_id: number): Promise
     });
     if (!res.ok) {
       const error = await res.json();
-      return { error: error.message || "Failed to fetch best deal products." };
+      return { error: error.message || "Failed to fetch data." };
     }
 
     const data = await res.json().catch(() => null);

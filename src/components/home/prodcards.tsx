@@ -13,7 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../components/ui/sheet"; */
-import { addorderitem } from "../../services/home/order";
+import { addorderitem, isexistincart } from "../../services/home/order";
 import { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../Context/AppContext";
 import { addtowishlist, isexist } from "../../services/home/wishlist";
@@ -32,14 +32,20 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
     setError(""); // Reset previous error
 
     try {
+      const check = await isexistincart(token, id);
+
+      console.log("check:", exist);
       const response = await addorderitem(token, { product_id: id });
 
-      if ("error" in response) {
+      if (response && "error" in response) {
         console.log(error);
+        //setCartCount(cartCount + 1);
         setError(response.error);
       } else {
         console.log(response);
-        setCartCount(cartCount + 1);
+        if ("exists" in check && check.exists === false) {
+          setCartCount(cartCount + 1); // correct increment
+        }
         setError(null);
       }
     } catch (err) {
