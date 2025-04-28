@@ -22,7 +22,7 @@ const Topbar = () => {
         <input type="text" placeholder="Search Product..." className="w-1/2 px-4 py-2 border rounded-full outline-none" />
 
         {/* Become Seller */}
-        <Link to="/become-seller">
+        <Link to="/becomeseller">
           <button className="bg-black text-white px-4 py-2 rounded-full text-sm">Become Seller</button>
         </Link>
       </div>
