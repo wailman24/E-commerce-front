@@ -1,27 +1,37 @@
 export interface seller {
   id?: number;
   user_id?: number;
-  adress?: string;
-  phone: number;
-  status: string;
+  adress: string;
+  phone: string;
+  status?: string;
   store: string;
-  logo: File;
+  logo?: File | null;
   paypal: string;
 }
 
-export async function addseller(token: string | null, data: seller | null): Promise<seller | { error: string }> {
+export async function addseller(token: string | null, data: seller): Promise<seller | { error: string }> {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/order_item", {
-      method: "post",
+    const formData = new FormData();
+    formData.append("store", data.store);
+    formData.append("phone", data.phone);
+    formData.append("adress", data.adress);
+    formData.append("paypal", data.paypal);
+    if (data.logo) {
+      formData.append("logo", data.logo); // ✅ Append file
+    }
+
+    const res = await fetch("http://127.0.0.1:8000/api/addseller", {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        // ⚠️ Don't set Content-Type! The browser sets it correctly for FormData
       },
-      body: JSON.stringify(data),
+      body: formData,
     });
+
     if (!res.ok) {
       const error = await res.json();
-      return { error: error.message || "Failed to fetch best deal products." };
+      return { error: error.message || "Failed to register seller." };
     }
 
     const result = await res.json();

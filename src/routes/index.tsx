@@ -11,6 +11,8 @@ import Products from "../pages/main/products";
 import ShoppingCartPage from "../pages/main/shoppingcarts";
 import Wishlist from "../pages/main/wishlist";
 import BecomeSeller from "../pages/main/becomeseller";
+import SellerLayout from "../layouts/SellerLayout";
+import DashboardHome from "../pages/dashboard/sellerdahsboard";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -32,16 +34,21 @@ function AppRoutes() {
           </>
         )}
         {user && (
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/cart" element={<ShoppingCartPage />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/becomeseller" element={<BecomeSeller />} />
-            {/* Add more protected routes here */}
-            <Route path="*" element={<Navigate to="/home" replace />} />
-          </Route>
+          <>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/cart" element={<ShoppingCartPage />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/becomeseller" element={<BecomeSeller />} />
+              {/* Add more protected routes here */}
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Route>
+            <Route element={<SellerLayout />}>
+              <Route path="/sellerdash" element={<DashboardHome />} />
+            </Route>
+          </>
         )}
 
         {/*  <Route path="*" element={<NotFound />} /> */}
