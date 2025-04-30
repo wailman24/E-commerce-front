@@ -13,6 +13,7 @@ import Wishlist from "../pages/main/wishlist";
 import BecomeSeller from "../pages/main/becomeseller";
 import SellerLayout from "../layouts/SellerLayout";
 import DashboardHome from "../pages/dashboard/sellerdahsboard";
+import Page from "../pages/dashboard/dashboard";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -35,6 +36,7 @@ function AppRoutes() {
         )}
         {user && (
           <>
+            <Route path="/dash" element={<Page />} />
             <Route element={<MainLayout />}>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={<Home />} />
@@ -42,9 +44,11 @@ function AppRoutes() {
               <Route path="/cart" element={<ShoppingCartPage />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/becomeseller" element={<BecomeSeller />} />
+
               {/* Add more protected routes here */}
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
+
             <Route element={<SellerLayout />}>
               <Route path="/sellerdash" element={<DashboardHome />} />
             </Route>
