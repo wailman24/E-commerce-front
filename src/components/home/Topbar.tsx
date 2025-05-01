@@ -7,7 +7,7 @@ const Topbar = () => {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { wishlistCount, cartCount } = appContext;
+  const { wishlistCount, cartCount, user } = appContext;
   console.log(wishlistCount);
   return (
     <header className="shadow">
@@ -50,6 +50,11 @@ const Topbar = () => {
             <li>
               <Link to="/products" className="hover:text-green-300">
                 Products
+              </Link>
+            </li>
+            <li>
+              <Link to="/sellerdash" className="hover:text-green-300">
+                Seller dashboard
               </Link>
             </li>
             <li>
