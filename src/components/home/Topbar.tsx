@@ -7,7 +7,7 @@ const Topbar = () => {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { wishlistCount, cartCount, user } = appContext;
+  const { wishlistCount, cartCount } = appContext;
   console.log(wishlistCount);
   return (
     <header className="shadow">
