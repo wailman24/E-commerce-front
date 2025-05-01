@@ -12,8 +12,9 @@ import ShoppingCartPage from "../pages/main/shoppingcarts";
 import Wishlist from "../pages/main/wishlist";
 import BecomeSeller from "../pages/main/becomeseller";
 import SellerLayout from "../layouts/SellerLayout";
-import DashboardHome from "../pages/dashboard/sellerdahsboard";
-import Page from "../pages/dashboard/dashboard";
+import DashboardHome from "../pages/dashboardseller/sellerdahsboard";
+import Page from "../pages/dashboardseller/dashboard";
+import Productseller from "../pages/dashboardseller/productseller";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -51,6 +52,7 @@ function AppRoutes() {
 
             <Route element={<SellerLayout />}>
               <Route path="/sellerdash" element={<DashboardHome />} />
+              <Route path="/dashboard/product" element={<Productseller />} />
             </Route>
           </>
         )}

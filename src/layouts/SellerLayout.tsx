@@ -1,14 +1,16 @@
 import { Outlet } from "react-router-dom";
-import SellerSidebar from "../components/home/SellerSidebar";
+//import SellerSidebar from "../components/home/SellerSidebar";
+import { SidebarInset, SidebarProvider } from "../components/ui/sidebar";
+import { AppSidebar } from "../components/app-sidebar";
 
 const SellerLayout = () => {
   return (
-    <div className="flex">
-      <SellerSidebar />
-      <main className="ml-64 w-full min-h-screen bg-gray-50 p-6">
+    <SidebarProvider>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
         <Outlet />
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 
