@@ -76,7 +76,7 @@ export async function getsellerproducts(token: string | null): Promise<product[]
     });
     if (!res.ok) {
       const error = await res.json();
-      return { error: error.message || "Failed to fetch best deal products." };
+      return { error: error.message || "Failed to fetch products." };
     }
 
     const data = await res.json();
