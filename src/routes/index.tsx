@@ -14,7 +14,7 @@ import BecomeSeller from "../pages/main/becomeseller";
 import SellerLayout from "../layouts/SellerLayout";
 import DashboardHome from "../pages/dashboardseller/sellerdahsboard";
 import Page from "../pages/dashboardseller/dashboard";
-import Productseller from "../pages/dashboardseller/productseller";
+import Productseller from "../pages/dashboardseller/products/productseller";
 
 //import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
@@ -37,7 +37,6 @@ function AppRoutes() {
         )}
         {user && (
           <>
-            <Route path="/dash" element={<Page />} />
             <Route element={<MainLayout />}>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={<Home />} />
@@ -51,6 +50,7 @@ function AppRoutes() {
             </Route>
 
             <Route element={<SellerLayout />}>
+              <Route path="/dash" element={<Page />} />
               <Route path="/sellerdash" element={<DashboardHome />} />
               <Route path="/dashboard/product" element={<Productseller />} />
             </Route>

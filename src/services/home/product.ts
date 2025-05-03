@@ -5,7 +5,7 @@ export interface product {
   about?: string;
   prix: number;
   stock?: number;
-  is_valid?: number;
+  is_valid?: string;
   seller_id?: number;
   created_at?: string;
   updated_at?: string;

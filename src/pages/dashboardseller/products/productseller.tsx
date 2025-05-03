@@ -1,6 +1,6 @@
 import * as React from "react";
-import { DataTable } from "../../components/data-table";
-import { Button } from "../../components/ui/button";
+import { DataTable } from "../../../components/data-table";
+import { Button } from "../../../components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 import {
   DropdownMenu,
@@ -8,11 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "../../../components/ui/dropdown-menu";
 import { MoreVerticalIcon } from "lucide-react";
-import { getsellerproducts, product } from "../../services/home/product";
+import { getsellerproducts, product } from "../../../services/home/product";
 import { ColumnDef } from "@tanstack/react-table";
-import { AppContext } from "../../Context/AppContext";
+import { AppContext } from "../../../Context/AppContext";
 
 export default function SimpleTableWithAddButton() {
   const appContext = React.useContext(AppContext);
@@ -69,7 +69,7 @@ export default function SimpleTableWithAddButton() {
       header: "Product Name",
     },
     {
-      accessorKey: "price",
+      accessorKey: "prix",
       header: "Price",
     },
     {
@@ -77,12 +77,12 @@ export default function SimpleTableWithAddButton() {
       header: "Stock",
     },
     {
-      accessorKey: "status",
+      accessorKey: "is_valid",
       header: "Status",
     },
     {
-      accessorKey: "isvalide",
-      header: "Validity",
+      accessorKey: "total_sold",
+      header: "Sold",
     },
     {
       id: "actions",
