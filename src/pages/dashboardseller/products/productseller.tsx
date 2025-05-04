@@ -96,9 +96,9 @@ export default function SimpleTableWithAddButton() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem onClick={() => handleEdit(row.original.id)}>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleEdit(row.original.id!)}>Edit </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleDelete(row.original.id)}>Delete</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDelete(row.original.id!)}>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),

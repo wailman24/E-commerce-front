@@ -12,11 +12,11 @@ import ShoppingCartPage from "../pages/main/shoppingcarts";
 import Wishlist from "../pages/main/wishlist";
 import BecomeSeller from "../pages/main/becomeseller";
 import SellerLayout from "../layouts/SellerLayout";
-import DashboardHome from "../pages/dashboardseller/sellerdahsboard";
+//import DashboardHome from "../pages/dashboardseller/sellerdahsboard";
 import Page from "../pages/dashboardseller/dashboard";
 import Productseller from "../pages/dashboardseller/products/productseller";
+import ProductAddForm from "../pages/dashboardseller/products/addproduct";
 
-//import EmailVerification from "../components/auth/verity-email";
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
 
@@ -51,7 +51,8 @@ function AppRoutes() {
 
             <Route element={<SellerLayout />}>
               <Route path="/dash" element={<Page />} />
-              <Route path="/sellerdash" element={<DashboardHome />} />
+              {/* <Route path="/sellerdash" element={<DashboardHome />} /> */}
+              <Route path="/product/add" element={<ProductAddForm />} />
               <Route path="/dashboard/product" element={<Productseller />} />
             </Route>
           </>

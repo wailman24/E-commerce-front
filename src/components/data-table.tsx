@@ -45,8 +45,8 @@ function DragHandle({ id }: { id: number }) {
   );
 }
  */
-function DraggableRow<T extends { id: number }>({ row }: { row: Row<T> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({ id: row.original.id });
+function DraggableRow<T extends { id: number | undefined }>({ row }: { row: Row<T> }) {
+  const { transform, transition, setNodeRef, isDragging } = useSortable({ id: row.original.id! });
   return (
     <TableRow
       data-state={row.getIsSelected() && "selected"}
@@ -62,12 +62,12 @@ function DraggableRow<T extends { id: number }>({ row }: { row: Row<T> }) {
   );
 }
 
-interface DataTableProps<T extends { id: number }> {
+interface DataTableProps<T extends { id: number | undefined }> {
   columns: ColumnDef<T>[];
   data: T[];
 }
 
-export function DataTable<T extends { id: number }>({ columns, data }: DataTableProps<T>) {
+export function DataTable<T extends { id: number | undefined }>({ columns, data }: DataTableProps<T>) {
   const [tableData, setTableData] = React.useState<T[]>(data);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
@@ -82,7 +82,7 @@ export function DataTable<T extends { id: number }>({ columns, data }: DataTable
   const sortableId = React.useId();
   const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(() => tableData.map(({ id }) => id), [tableData]);
+  const dataIds = React.useMemo<UniqueIdentifier[]>(() => tableData.map(({ id }) => id!), [tableData]);
 
   const table = useReactTable({
     data: tableData,
@@ -90,7 +90,7 @@ export function DataTable<T extends { id: number }>({ columns, data }: DataTable
     state: { columnVisibility, pagination },
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
-    getRowId: (row) => row.id.toString(),
+    getRowId: (row) => row.id!.toString(),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -134,7 +134,7 @@ export function DataTable<T extends { id: number }>({ columns, data }: DataTable
               {table.getRowModel().rows?.length ? (
                 <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
                   {table.getRowModel().rows.map((row) => (
-                    <DraggableRow key={row.id} row={row} />
+                    <DraggableRow key={row.id!} row={row} />
                   ))}
                 </SortableContext>
               ) : (

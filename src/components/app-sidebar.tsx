@@ -45,16 +45,16 @@ const data = {
     },
     {
       title: "Products",
-      url: "/dashboard/product",
+      url: "#",
       icon: IconListDetails,
       items: [
         {
           title: "Products",
-          url: "#",
+          url: "/dashboard/product",
         },
         {
           title: "Add Product",
-          url: "#",
+          url: "/product/add",
         },
         {
           title: "Settings",
