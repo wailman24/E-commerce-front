@@ -13,6 +13,12 @@ import { MoreVerticalIcon } from "lucide-react";
 import { getsellerproducts, product } from "../../../services/home/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
+import { Input } from "../../../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { Textarea } from "../../../components/ui/textarea";
+import { category, getcategories } from "../../../services/home/category";
+import { Label } from "../../../components/ui/label";
 
 export default function SimpleTableWithAddButton() {
   const appContext = React.useContext(AppContext);
@@ -20,6 +26,10 @@ export default function SimpleTableWithAddButton() {
 
   const { token } = appContext;
   const [data, setData] = React.useState<product[]>([]);
+  const [showForm, setShowForm] = React.useState(false);
+  const [editProduct, setEditProduct] = React.useState<product | null>(null);
+  const [categories, setCategories] = React.useState<category[]>([]);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchProds = async () => {
@@ -44,6 +54,30 @@ export default function SimpleTableWithAddButton() {
     fetchProds();
   }, [token]);
 
+  React.useEffect(() => {
+    const fetchcatg = async () => {
+      try {
+        // setLoading(true);
+        const response = await getcategories(token);
+        if ("error" in response) {
+          setError(response.error);
+          console.log(error);
+          setCategories([]);
+        } else {
+          setCategories(response);
+          console.log(response);
+          setError(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        //setLoading(false);
+      }
+    };
+
+    fetchcatg();
+  }, [error, token]);
+
   const handleAdd = () => {
     /*  const newId = Math.max(...data.map((item) => item.id), 0) + 1;
     setData((prev) => [...prev, { id: newId, name: `New Product ${newId}`, price: 0, stock: 0, status: "Active", isvalide: "Yes" }]);
@@ -51,7 +85,11 @@ export default function SimpleTableWithAddButton() {
   };
 
   const handleEdit = (id: number) => {
-    console.log(`Edit clicked for id: ${id}`);
+    const selectedProduct = data.find((prod) => prod.id === id);
+    if (selectedProduct) {
+      setEditProduct(selectedProduct);
+      setShowForm(true);
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -114,6 +152,122 @@ export default function SimpleTableWithAddButton() {
         </Button>
       </div>
       <DataTable columns={columns} data={data} />
+      {showForm && (
+        <Drawer open={editProduct !== null} onOpenChange={() => setEditProduct(null)}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Edit Product</DrawerTitle>
+            </DrawerHeader>
+
+            <div className="grid gap-4 p-4">
+              {/* Product Name */}
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium">
+                  Product Name
+                </label>
+                <Input
+                  id="name"
+                  value={editProduct?.name || ""}
+                  onChange={(e) => setEditProduct((prev) => prev && { ...prev, name: e.target.value })}
+                />
+              </div>
+
+              {/* About */}
+              <div className="space-y-2">
+                <label htmlFor="about" className="text-sm font-medium">
+                  About
+                </label>
+                <Textarea
+                  id="about"
+                  value={editProduct?.about || ""}
+                  onChange={(e) => setEditProduct((prev) => prev && { ...prev, about: e.target.value })}
+                />
+              </div>
+
+              {/* Price */}
+              <div className="space-y-2">
+                <label htmlFor="price" className="text-sm font-medium">
+                  Price
+                </label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={editProduct?.prix || ""}
+                  onChange={(e) => setEditProduct((prev) => prev && { ...prev, prix: parseFloat(e.target.value) })}
+                />
+              </div>
+
+              {/* Stock */}
+              <div className="space-y-2">
+                <label htmlFor="stock" className="text-sm font-medium">
+                  Stock
+                </label>
+                <Input
+                  id="stock"
+                  type="number"
+                  value={editProduct?.stock || ""}
+                  onChange={(e) => setEditProduct((prev) => prev && { ...prev, stock: parseInt(e.target.value) })}
+                />
+              </div>
+
+              {/* Category */}
+              <Label htmlFor="category" className="mb-1 block">
+                Category
+              </Label>
+              <Select
+                value={String(editProduct?.category_id ?? "")}
+                onValueChange={(value) => setEditProduct((prev) => prev && { ...prev, category_id: Number(value) })}
+              >
+                <SelectTrigger id="category" className="mt-1">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories
+                    .filter((cat) => cat.category_id === null)
+                    .map((parent) => {
+                      const children = categories.filter((child) => child.category_id === parent.id);
+                      return (
+                        <div key={parent.id} className="px-2 py-1">
+                          <div className="text-sm font-semibold text-muted-foreground mb-1">{parent.name}</div>
+                          {children.map((child) => (
+                            <SelectItem key={child.id} value={String(child.id)}>
+                              {child.name}
+                            </SelectItem>
+                          ))}
+                        </div>
+                      );
+                    })}
+                </SelectContent>
+              </Select>
+
+              {/* Image (optional, if needed) */}
+              {/* <div className="space-y-2">
+              <label htmlFor="image" className="text-sm font-medium">Image</label>
+              {editProduct?.images && <img src={editProduct.images!} className="h-20 w-20 object-cover mb-2" />}
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const url = URL.createObjectURL(file);
+                    setEditProduct((prev) => prev ? { ...prev, image: url, newImageFile: file } : null);
+                  }
+                }}
+              />
+            </div> */}
+            </div>
+
+            <DrawerFooter>
+              <Button onClick={handleEdit}>Save</Button>
+              <DrawerClose asChild>
+                <Button variant="ghost">Cancel</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      )}
     </div>
   );
 }

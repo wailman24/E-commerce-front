@@ -1,7 +1,7 @@
 export interface product {
   id: number;
   name?: string;
-  category?: string;
+  category_id: number;
   about?: string;
   prix: number;
   stock?: number;
@@ -103,10 +103,10 @@ export async function addproduct(token: string | null, dataitem: product): Promi
     }
 
     const data = await res.json();
-    if (!data || !data.data) {
+    if (!data || !data.DATA) {
       return { error: "No product data returned from server." };
     }
-    return data.data;
+    return data.DATA;
   } catch (error) {
     console.error("Error during registration:", error);
     return { error: "An unexpected error occurred. Please try again later." };

@@ -53,7 +53,7 @@ const Topbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/sellerdash" className="hover:text-green-300">
+              <Link to="/dash" className="hover:text-green-300">
                 Seller dashboard
               </Link>
             </li>
