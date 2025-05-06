@@ -10,15 +10,18 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { MoreVerticalIcon } from "lucide-react";
-import { getsellerproducts, product } from "../../../services/home/product";
+import { getsellerproducts, product, updateproduct } from "../../../services/home/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
+//import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "../../../components/ui/dialog"; // adjust the import path based on your setup
+
 import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { category, getcategories } from "../../../services/home/category";
 import { Label } from "../../../components/ui/label";
+import { addimage } from "../../../services/home/image";
 
 export default function SimpleTableWithAddButton() {
   const appContext = React.useContext(AppContext);
@@ -30,7 +33,10 @@ export default function SimpleTableWithAddButton() {
   const [editProduct, setEditProduct] = React.useState<product | null>(null);
   const [categories, setCategories] = React.useState<category[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-
+  const [showImages, setShowImages] = React.useState(false);
+  const [singleImage, setSingleImage] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
+  const [askNextImage, setAskNextImage] = React.useState(false);
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
@@ -57,11 +63,10 @@ export default function SimpleTableWithAddButton() {
   React.useEffect(() => {
     const fetchcatg = async () => {
       try {
-        // setLoading(true);
         const response = await getcategories(token);
         if ("error" in response) {
           setError(response.error);
-          console.log(error);
+          console.log(response.error);
           setCategories([]);
         } else {
           setCategories(response);
@@ -69,14 +74,12 @@ export default function SimpleTableWithAddButton() {
           setError(null);
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        //setLoading(false);
+        console.error("Failed to fetch categories:", error);
       }
     };
 
     fetchcatg();
-  }, [error, token]);
+  }, [token]);
 
   const handleAdd = () => {
     /*  const newId = Math.max(...data.map((item) => item.id), 0) + 1;
@@ -89,11 +92,89 @@ export default function SimpleTableWithAddButton() {
     if (selectedProduct) {
       setEditProduct(selectedProduct);
       setShowForm(true);
+      console.log("befor click: ", selectedProduct);
+    }
+  };
+
+  const handleupdate = async () => {
+    try {
+      if (!editProduct) return;
+
+      const result = await updateproduct(token, editProduct);
+
+      if ("error" in result) {
+        setError(result.error);
+      } else {
+        // update local data state
+        setData((prev) => prev.map((item) => (item.id === editProduct.id ? result : item)));
+        console.log("editProduct:", editProduct);
+
+        // close the form
+        //setEditProduct(null);
+        setShowForm(false);
+        setShowImages(true);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
     }
   };
 
   const handleDelete = (id: number) => {
     setData((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleSingleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSingleImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUploadImage = async () => {
+    setAskNextImage(true);
+
+    try {
+      console.log(singleImage);
+      const result = await addimage(token, editProduct!.id, singleImage!);
+
+      if ("error" in result) {
+        setError(result.error); // Set error message
+        console.log(error);
+      } else {
+        //setSuccess(true);
+        console.log("Register image successful", result);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
+  };
+
+  const resetImageUpload = () => {
+    setSingleImage(null);
+    setPreview(null);
+    setAskNextImage(false);
+  };
+
+  const handleDeleteImage = async (imageId: number) => {
+    console.log(imageId);
+    try {
+      console.log(singleImage);
+      const result = await addimage(token, editProduct!.id, singleImage!);
+
+      if ("error" in result) {
+        setError(result.error); // Set error message
+        console.log(error);
+      } else {
+        //setSuccess(true);
+        console.log("deleted image successful", result);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
   };
 
   const columns: ColumnDef<product>[] = [
@@ -153,18 +234,16 @@ export default function SimpleTableWithAddButton() {
       </div>
       <DataTable columns={columns} data={data} />
       {showForm && (
-        <Drawer open={editProduct !== null} onOpenChange={() => setEditProduct(null)}>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>Edit Product</DrawerTitle>
-            </DrawerHeader>
+        <Dialog open={showForm} onOpenChange={(open) => setShowForm(open)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Product</DialogTitle>
+            </DialogHeader>
 
-            <div className="grid gap-4 p-4">
+            <div className="grid gap-4 py-2">
               {/* Product Name */}
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Product Name
-                </label>
+                <Label htmlFor="name">Product Name</Label>
                 <Input
                   id="name"
                   value={editProduct?.name || ""}
@@ -174,9 +253,7 @@ export default function SimpleTableWithAddButton() {
 
               {/* About */}
               <div className="space-y-2">
-                <label htmlFor="about" className="text-sm font-medium">
-                  About
-                </label>
+                <Label htmlFor="about">About</Label>
                 <Textarea
                   id="about"
                   value={editProduct?.about || ""}
@@ -186,9 +263,7 @@ export default function SimpleTableWithAddButton() {
 
               {/* Price */}
               <div className="space-y-2">
-                <label htmlFor="price" className="text-sm font-medium">
-                  Price
-                </label>
+                <Label htmlFor="price">Price</Label>
                 <Input
                   id="price"
                   type="number"
@@ -199,9 +274,7 @@ export default function SimpleTableWithAddButton() {
 
               {/* Stock */}
               <div className="space-y-2">
-                <label htmlFor="stock" className="text-sm font-medium">
-                  Stock
-                </label>
+                <Label htmlFor="stock">Stock</Label>
                 <Input
                   id="stock"
                   type="number"
@@ -239,34 +312,74 @@ export default function SimpleTableWithAddButton() {
                     })}
                 </SelectContent>
               </Select>
-
-              {/* Image (optional, if needed) */}
-              {/* <div className="space-y-2">
-              <label htmlFor="image" className="text-sm font-medium">Image</label>
-              {editProduct?.images && <img src={editProduct.images!} className="h-20 w-20 object-cover mb-2" />}
-              <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    setEditProduct((prev) => prev ? { ...prev, image: url, newImageFile: file } : null);
-                  }
-                }}
-              />
-            </div> */}
             </div>
 
-            <DrawerFooter>
-              <Button onClick={handleEdit}>Save</Button>
-              <DrawerClose asChild>
+            <DialogFooter className="mt-4">
+              <Button onClick={handleupdate}>Save</Button>
+              <DialogClose asChild>
                 <Button variant="ghost">Cancel</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      {showImages && (
+        <Dialog open={showImages} onOpenChange={(open) => setShowImages(open)}>
+          <DialogContent className="space-y-4 p-6 max-w-sm">
+            <h2 className="text-lg font-semibold">Upload Product Image</h2>
+
+            {/* Show Existing Images with Delete */}
+            {editProduct ? (
+              <div className="flex flex-wrap gap-2">
+                {editProduct.images?.length ? (
+                  editProduct.images.map((img) => (
+                    <div key={img.id} className="relative w-24 h-24 border rounded overflow-hidden">
+                      <img src={`http://127.0.0.1:8000/storage/${img.image_url}`} alt="Product" className="w-full h-full object-cover" />
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className="absolute top-1 right-1 size-5"
+                        onClick={() => handleDeleteImage(img.id!)}
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p>No images available.</p>
+                )}
+              </div>
+            ) : (
+              <p>Loading...</p>
+            )}
+
+            {/* Add New Image */}
+            {!askNextImage ? (
+              <>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSingleImageChange}
+                  disabled={askNextImage} // Prevent file selection after upload
+                />
+                {preview && <img src={preview} alt="preview" className="h-24 w-24 object-cover rounded border mt-2" />}
+                <Button disabled={!singleImage} className="w-full" onClick={handleUploadImage}>
+                  Upload Image
+                </Button>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <p>✅ Image uploaded. Do you want to add another?</p>
+                <div className="flex justify-end gap-2">
+                  <Button variant="secondary" onClick={() => setShowImages(false)}>
+                    No
+                  </Button>
+                  <Button onClick={resetImageUpload}>Yes</Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
