@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { MoreVerticalIcon } from "lucide-react";
-import { getsellerproducts, product, updateproduct } from "../../../services/home/product";
+import { deleteproduct, getsellerproducts, product, updateproduct } from "../../../services/home/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
 //import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
@@ -21,7 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "../../../components/ui/textarea";
 import { category, getcategories } from "../../../services/home/category";
 import { Label } from "../../../components/ui/label";
-import { addimage } from "../../../services/home/image";
+import { addimage, deleteimage } from "../../../services/home/image";
+import { useNavigate } from "react-router-dom";
 
 export default function SimpleTableWithAddButton() {
   const appContext = React.useContext(AppContext);
@@ -81,10 +82,9 @@ export default function SimpleTableWithAddButton() {
     fetchcatg();
   }, [token]);
 
+  const navigate = useNavigate();
   const handleAdd = () => {
-    /*  const newId = Math.max(...data.map((item) => item.id), 0) + 1;
-    setData((prev) => [...prev, { id: newId, name: `New Product ${newId}`, price: 0, stock: 0, status: "Active", isvalide: "Yes" }]);
-  */
+    navigate(`/product/add`);
   };
 
   const handleEdit = (id: number) => {
@@ -120,8 +120,22 @@ export default function SimpleTableWithAddButton() {
     }
   };
 
-  const handleDelete = (id: number) => {
-    setData((prev) => prev.filter((item) => item.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      const result = await deleteproduct(token, id);
+
+      if (result && "error" in result) {
+        setError(result.error); // Set error message
+        console.log(error);
+      } else {
+        //setSuccess(true);
+        console.log("delete product successful", result);
+        setData((prev) => prev.filter((item) => item.id !== id));
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
   };
 
   const handleSingleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,14 +176,22 @@ export default function SimpleTableWithAddButton() {
     console.log(imageId);
     try {
       console.log(singleImage);
-      const result = await addimage(token, editProduct!.id, singleImage!);
+      const result = await deleteimage(token, imageId);
 
-      if ("error" in result) {
+      if (result && "error" in result) {
         setError(result.error); // Set error message
         console.log(error);
       } else {
         //setSuccess(true);
         console.log("deleted image successful", result);
+        setEditProduct((prev) =>
+          prev
+            ? {
+                ...prev,
+                images: prev.images?.filter((img) => img.id !== imageId) || [],
+              }
+            : null
+        );
       }
     } catch (err) {
       setError("An unexpected error occurred.");
