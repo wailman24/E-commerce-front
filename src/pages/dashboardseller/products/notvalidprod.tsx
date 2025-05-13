@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { MoreVerticalIcon } from "lucide-react";
-import { deleteproduct, getsellerproducts, product, updateproduct } from "../../../services/home/product";
+import { deleteproduct, product, updateproduct, getnotvalidproductforseller } from "../../../services/home/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
 //import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
@@ -24,7 +24,7 @@ import { Label } from "../../../components/ui/label";
 import { addimage, deleteimage } from "../../../services/home/image";
 import { useNavigate } from "react-router-dom";
 
-export default function Productseller() {
+export default function NotvalidProductseller() {
   const appContext = React.useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
@@ -42,7 +42,7 @@ export default function Productseller() {
     const fetchProds = async () => {
       try {
         //setLoading(true);
-        const response = await getsellerproducts(token);
+        const response = await getnotvalidproductforseller(token);
         if ("error" in response) {
           //setError(response.error);
           setData([]);

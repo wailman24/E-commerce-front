@@ -26,25 +26,9 @@ import {
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Button } from "../components/ui/button";
-/* import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu"; */
+import { Input } from "../components/ui/input";
 import { ChevronsLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsRightIcon } from "lucide-react";
-/* 
-function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({ id });
-  return (
-    <Button {...attributes} {...listeners} variant="ghost" size="icon" className="text-muted-foreground size-7 hover:bg-transparent">
-      <span className="sr-only">Drag to reorder</span>
-      ::
-    </Button>
-  );
-}
- */
+
 function DraggableRow<T extends { id: number | undefined }>({ row }: { row: Row<T> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({ id: row.original.id! });
   return (
@@ -71,23 +55,28 @@ export function DataTable<T extends { id: number | undefined }>({ columns, data 
   const [tableData, setTableData] = React.useState<T[]>(data);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+  const [globalFilter, setGlobalFilter] = React.useState("");
 
-  //const [tableData, setTableData] = React.useState<T[]>(data);
-
-  // Sync tableData when data prop changes
   React.useEffect(() => {
     setTableData(data);
   }, [data]);
 
-  const sortableId = React.useId();
-  const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor), useSensor(KeyboardSensor));
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(() => tableData.map(({ id }) => id!), [tableData]);
 
   const table = useReactTable({
     data: tableData,
     columns,
-    state: { columnVisibility, pagination },
+    state: {
+      columnVisibility,
+      pagination,
+      globalFilter,
+    },
+    globalFilterFn: (row, columnId, filterValue) => {
+      return Object.values(row.original).some((value) => String(value).toLowerCase().includes(filterValue.toLowerCase()));
+    },
+    onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
     getRowId: (row) => row.id!.toString(),
@@ -110,14 +99,19 @@ export function DataTable<T extends { id: number | undefined }>({ columns, data 
 
   return (
     <div className="w-full px-4 lg:px-6">
+      {/* Search bar */}
+      <div className="flex justify-end mb-4">
+        <Input
+          type="text"
+          placeholder="Search..."
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="w-full max-w-sm"
+        />
+      </div>
+
       <div className="overflow-hidden rounded-lg border">
-        <DndContext
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          onDragEnd={handleDragEnd}
-          sensors={sensors}
-          id={sortableId}
-        >
+        <DndContext collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd} sensors={sensors}>
           <Table>
             <TableHeader className="bg-muted sticky top-0 z-10">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -149,6 +143,7 @@ export function DataTable<T extends { id: number | undefined }>({ columns, data 
         </DndContext>
       </div>
 
+      {/* Pagination */}
       <div className="flex items-center justify-between px-4 py-4">
         <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">{table.getFilteredRowModel().rows.length} total row(s)</div>
         <div className="flex items-center gap-2">

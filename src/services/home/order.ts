@@ -10,11 +10,12 @@ export interface order {
   updated_at?: string;
 }
 export interface item {
-  id?: number;
+  id: number;
   product: product;
   order?: order;
   qte: number;
   price: number;
+  status?: string;
 }
 
 export async function addorderitem(token: string | null, dataitem: { product_id: number }): Promise<item | { error: string }> {
@@ -153,6 +154,28 @@ export async function isexistincart(token: string | null, product_id: number): P
     //return data.data;
   } catch (error) {
     console.error("Error during registration:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getselleritems(token: string | null): Promise<item[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getallselleritems", {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch items." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }

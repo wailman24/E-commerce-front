@@ -57,8 +57,27 @@ const data = {
           url: "/product/add",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Products not valid",
+          url: "/dashboard/NotValidProduct",
+        },
+      ],
+    },
+    {
+      title: "Orders",
+      url: "#",
+      icon: IconFolder,
+      items: [
+        {
+          title: "All Orders",
+          url: "/dashboard/order",
+        },
+        {
+          title: "Add Product",
+          url: "/product/add",
+        },
+        {
+          title: "Products not valid",
+          url: "/dashboard/NotValidProduct",
         },
       ],
     },
@@ -66,11 +85,6 @@ const data = {
       title: "Analytics",
       url: "#",
       icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
     },
     {
       title: "Team",

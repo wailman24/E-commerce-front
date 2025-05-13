@@ -87,6 +87,28 @@ export async function getsellerproducts(token: string | null): Promise<product[]
   }
 }
 
+export async function getnotvalidproductforseller(token: string | null): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getnotvalidproductforseller", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during :", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
 export async function addproduct(token: string | null, dataitem: product): Promise<product | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/addproduct", {
