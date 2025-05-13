@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { MoreVerticalIcon } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
-import { getselleritems, item } from "../../../services/home/order";
+import { getselleritems, item, updateitemstatus } from "../../../services/home/order";
 
 export default function Orderseller() {
   const appContext = React.useContext(AppContext);
@@ -19,7 +19,7 @@ export default function Orderseller() {
   const [selectedItem, setSelectedItem] = React.useState<item | null>(null);
   const [statusDialogOpen, setStatusDialogOpen] = React.useState(false);
   const [newStatus, setNewStatus] = React.useState<string>("");
-
+  const [error, setError] = React.useState<string | null>(null);
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
@@ -36,13 +36,25 @@ export default function Orderseller() {
     fetchProds();
   }, [token]);
 
-  const handleStatusUpdate = () => {
-    if (!selectedItem) return;
+  const handleStatusUpdate = async () => {
+    try {
+      if (!selectedItem) return;
 
-    // Update status locally (you can later send to server)
-    setData((prev) => prev.map((item) => (item.id === selectedItem.id ? { ...item, status: newStatus } : item)));
+      const result = await updateitemstatus(token, selectedItem.id, newStatus);
 
-    setStatusDialogOpen(false);
+      if (result && "error" in result) {
+        setError(result.error);
+        console.log(error);
+      } else {
+        setData((prev) => prev.map((item) => (item.id === selectedItem.id ? { ...item, status: newStatus } : item)));
+
+        setStatusDialogOpen(false);
+        console.log("item:", selectedItem);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
   };
 
   const columns: ColumnDef<item>[] = [

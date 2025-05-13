@@ -179,3 +179,26 @@ export async function getselleritems(token: string | null): Promise<item[] | { e
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+
+export async function updateitemstatus(token: string | null, order_item: number, status: string): Promise<item | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/updateitemstatus/${order_item}`, {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch order." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}

@@ -71,14 +71,6 @@ const data = {
           title: "All Orders",
           url: "/dashboard/order",
         },
-        {
-          title: "Add Product",
-          url: "/product/add",
-        },
-        {
-          title: "Products not valid",
-          url: "/dashboard/NotValidProduct",
-        },
       ],
     },
     {
