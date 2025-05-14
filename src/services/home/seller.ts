@@ -1,6 +1,8 @@
+import { user } from "../../pages/auth/signup";
+
 export interface seller {
-  id?: number;
-  user_id?: number;
+  id: number;
+  user?: user;
   adress: string;
   phone: string;
   status?: string;
@@ -38,6 +40,28 @@ export async function addseller(token: string | null, data: seller): Promise<sel
     return result.data;
   } catch (error) {
     console.error("Error during registration:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getallseller(token: string | null): Promise<seller[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getallseller", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch sellers." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error when getting sellers:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
