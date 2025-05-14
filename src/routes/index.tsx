@@ -18,6 +18,8 @@ import Productseller from "../pages/dashboardseller/products/productseller";
 import ProductAddForm from "../pages/dashboardseller/products/addproduct";
 import NotvalidProductseller from "../pages/dashboardseller/products/notvalidprod";
 import Orderseller from "../pages/dashboardseller/orders/sellerorders";
+import AdminLayout from "../layouts/AdminLayout";
+import AllUsers from "../pages/dashboardadmin/users/allusers";
 
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
@@ -58,6 +60,16 @@ function AppRoutes() {
               <Route path="/dashboard/product" element={<Productseller />} />
               <Route path="/dashboard/NotValidProduct" element={<NotvalidProductseller />} />
               <Route path="/dashboard/order" element={<Orderseller />} />
+            </Route>
+
+            <Route element={<AdminLayout />}>
+              <Route path="/admindash" element={<Page />} />
+              <Route path="/Admin/dashboard/users" element={<AllUsers />} />
+              {/* Uncomment and modify the following routes as needed */}
+              {/* <Route path="/product/add" element={<ProductAddForm />} />
+              <Route path="/dashboard/product" element={<Productseller />} />
+              <Route path="/dashboard/NotValidProduct" element={<NotvalidProductseller />} />
+              <Route path="/dashboard/order" element={<Orderseller />} /> */}
             </Route>
           </>
         )}

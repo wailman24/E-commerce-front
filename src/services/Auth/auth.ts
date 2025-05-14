@@ -118,3 +118,25 @@ export async function getuser(token: string) {
 
   return res.json();
 }
+
+export async function getallusers(token: string | null): Promise<user[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getalluser", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch users." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error when getting users:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}

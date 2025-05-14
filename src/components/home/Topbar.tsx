@@ -7,8 +7,9 @@ const Topbar = () => {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { wishlistCount, cartCount } = appContext;
+  const { wishlistCount, cartCount, user } = appContext;
   console.log(wishlistCount);
+  console.log("Role:", user?.role);
   return (
     <header className="shadow">
       {/* Top White Bar */}
@@ -52,11 +53,21 @@ const Topbar = () => {
                 Products
               </Link>
             </li>
-            <li>
-              <Link to="/dash" className="hover:text-green-300">
-                Seller dashboard
-              </Link>
-            </li>
+            {user?.role === "Seller" && (
+              <li>
+                <Link to="/dash" className="hover:text-green-300">
+                  Seller Dashboard
+                </Link>
+              </li>
+            )}
+
+            {user?.role === "Admin" && (
+              <li>
+                <Link to="/admindash" className="hover:text-green-300">
+                  Admin Dashboard
+                </Link>
+              </li>
+            )}
             <li>
               <Link to="/faq" className="hover:text-green-300">
                 FAQ
