@@ -35,7 +35,7 @@ export default function AllUsers() {
   }, [token]);
 
   const handleAbout = async (id: number) => {
-    console.log("About clicked for user with ID:", id);
+    console.log("user with ID:", id);
     // Handle the action for the selected user here
   };
   const columns: ColumnDef<user>[] = [
