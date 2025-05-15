@@ -5,7 +5,7 @@ export interface product {
   about?: string;
   prix: number;
   stock?: number;
-  is_valid?: string;
+  is_valid?: boolean;
   seller_id?: number;
   created_at?: string;
   updated_at?: string;
@@ -38,7 +38,29 @@ export async function getbestdealsproducts(token: string | null): Promise<produc
     const data = await res.json();
     return data.data;
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getallproducts(token: string | null): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getallproducts", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during process:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
@@ -54,13 +76,13 @@ export async function getallvalidproducts(token: string | null): Promise<product
     });
     if (!res.ok) {
       const error = await res.json();
-      return { error: error.message || "Failed to fetch best deal products." };
+      return { error: error.message || "Failed to fetch products." };
     }
 
     const data = await res.json();
     return data.data;
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("Error during process:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
@@ -82,7 +104,7 @@ export async function getsellerproducts(token: string | null): Promise<product[]
     const data = await res.json();
     return data.data;
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("Error during process:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
@@ -130,7 +152,7 @@ export async function addproduct(token: string | null, dataitem: product): Promi
     }
     return data.DATA;
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("Error during process:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
@@ -180,6 +202,60 @@ export async function deleteproduct(token: string | null, Product_id: number): P
     return data.data;
   } catch (error) {
     console.error("Error during registration:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function deleteproductAdmin(token: string | null, Product_id: number): Promise<product | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/deleteproductadmin/${Product_id}`, {
+      method: "delete",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to delete products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during registration:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+
+export async function updateproductstatus(
+  token: string | null,
+  productid: number,
+  newstatus: boolean
+): Promise<product | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/updateproductstatus/${productid}`, {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ is_valid: newstatus }),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to update product." };
+    }
+
+    const data = await res.json();
+    if (!data || !data.DATA) {
+      return { error: "No product data returned from server." };
+    }
+    return data.DATA;
+  } catch (error) {
+    console.error("Error during :", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
