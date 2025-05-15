@@ -14,7 +14,7 @@ export default function PendingSellers() {
 
   const { token } = appContext;
   const [data, setData] = React.useState<seller[]>([]);
-  const [error, setError] = React.useState<string | null>(null);
+  //const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchSellers = async () => {
