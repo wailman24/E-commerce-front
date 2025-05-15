@@ -140,3 +140,26 @@ export async function getallusers(token: string | null): Promise<user[] | { erro
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+
+export async function deleteuser(token: string | null, user_id: number): Promise<user | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/deleteuser/${user_id}`, {
+      method: "delete",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to delete user." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during deleting:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}

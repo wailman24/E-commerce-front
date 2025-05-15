@@ -21,6 +21,7 @@ import Orderseller from "../pages/dashboardseller/orders/sellerorders";
 import AdminLayout from "../layouts/AdminLayout";
 import AllUsers from "../pages/dashboardadmin/users/allusers";
 import Sellers from "../pages/dashboardadmin/users/sellers";
+import PendingSellers from "../pages/dashboardadmin/users/sellerpending";
 
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
@@ -67,6 +68,7 @@ function AppRoutes() {
               <Route path="/admindash" element={<Page />} />
               <Route path="/Admin/dashboard/users" element={<AllUsers />} />
               <Route path="/Admin/dashboard/allsellers" element={<Sellers />} />
+              <Route path="/Admin/dashboard/sellers" element={<PendingSellers />} />
               {/* Uncomment and modify the following routes as needed */}
               {/* <Route path="/product/add" element={<ProductAddForm />} />
               <Route path="/dashboard/product" element={<Productseller />} />

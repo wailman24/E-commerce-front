@@ -1,7 +1,13 @@
 import * as React from "react";
 import { DataTable } from "../../../components/data-table";
 import { Button } from "../../../components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu";
 //import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 //import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
@@ -9,7 +15,7 @@ import { MoreVerticalIcon } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
 import { user } from "../../../pages/auth/signup";
-import { getallusers } from "../../../services/Auth/auth";
+import { deleteuser, getallusers } from "../../../services/Auth/auth";
 
 export default function AllUsers() {
   const appContext = React.useContext(AppContext);
@@ -17,7 +23,7 @@ export default function AllUsers() {
 
   const { token } = appContext;
   const [data, setData] = React.useState<user[]>([]);
-  //const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
@@ -38,6 +44,25 @@ export default function AllUsers() {
     console.log("user with ID:", id);
     // Handle the action for the selected user here
   };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const result = await deleteuser(token, id);
+
+      if (result && "error" in result) {
+        setError(result.error); // Set error message
+        console.log(error);
+      } else {
+        //setSuccess(true);
+        console.log("delete user successful", result);
+        setData((prev) => prev.filter((item) => item.id !== id));
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error(err);
+    }
+  };
+
   const columns: ColumnDef<user>[] = [
     {
       accessorKey: "name",
@@ -63,13 +88,9 @@ export default function AllUsers() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => {
-                handleAbout(row.original.id);
-              }}
-            >
-              About
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleAbout(row.original.id!)}>About</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleDelete(row.original.id!)}>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
