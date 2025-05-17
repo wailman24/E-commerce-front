@@ -65,6 +65,28 @@ export async function getallproducts(token: string | null): Promise<product[] | 
   }
 }
 
+export async function getnotvalidproductforadmin(token: string | null): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getnotvalidproductforadmin", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
 export async function getallvalidproducts(token: string | null): Promise<product[] | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/getvalidproducts", {
@@ -228,7 +250,6 @@ export async function deleteproductAdmin(token: string | null, Product_id: numbe
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
-
 
 export async function updateproductstatus(
   token: string | null,

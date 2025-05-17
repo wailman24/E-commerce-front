@@ -23,6 +23,11 @@ import AllUsers from "../pages/dashboardadmin/users/allusers";
 import Sellers from "../pages/dashboardadmin/users/sellers";
 import PendingSellers from "../pages/dashboardadmin/users/sellerpending";
 import AllProducts from "../pages/dashboardadmin/products/allproducts";
+import ProductPending from "../pages/dashboardadmin/products/productpending";
+import CategoryAddForm from "../pages/dashboardadmin/products/addcategory";
+import Categories from "../pages/dashboardadmin/products/categories";
+import AllOrders from "../pages/dashboardadmin/orders/allorders";
+import Items from "../pages/dashboardadmin/orders/items";
 
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
@@ -71,6 +76,12 @@ function AppRoutes() {
               <Route path="/Admin/dashboard/allsellers" element={<Sellers />} />
               <Route path="/Admin/dashboard/sellers" element={<PendingSellers />} />
               <Route path="/Admin/dashboard/allproducts" element={<AllProducts />} />
+              <Route path="/Admin/dashboard/products" element={<ProductPending />} />
+              <Route path="/Admin/dashboard/categories" element={<Categories />} />
+              <Route path="/Admin/dashboard/addcategories" element={<CategoryAddForm />} />
+              <Route path="/Admin/dashboard/orders" element={<AllOrders />} />
+              <Route path="/Admin/dashboard/items-sold" element={<Items />} />
+              <Route path="/Admin/dashboard/items-sold/:id" element={<Items />} />
               {/* Uncomment and modify the following routes as needed */}
               {/* <Route path="/product/add" element={<ProductAddForm />} />
               <Route path="/dashboard/product" element={<Productseller />} />

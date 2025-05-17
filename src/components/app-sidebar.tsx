@@ -184,7 +184,7 @@ const navForAdmin = {
     {
       title: "Users",
       url: "#",
-      icon: IconListDetails,
+      icon: IconUsers,
       items: [
         {
           title: "All Users",
@@ -217,6 +217,10 @@ const navForAdmin = {
           title: "categories",
           url: "Admin/dashboard/categories",
         },
+        {
+          title: "Add category",
+          url: "Admin/dashboard/addcategories",
+        },
       ],
     },
     {
@@ -226,7 +230,11 @@ const navForAdmin = {
       items: [
         {
           title: "All Orders",
-          url: "/dashboard/order",
+          url: "Admin/dashboard/orders",
+        },
+        {
+          title: "Items Sold",
+          url: "Admin/dashboard/items-sold",
         },
       ],
     },
