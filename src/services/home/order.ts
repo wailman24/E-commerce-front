@@ -10,6 +10,12 @@ export interface order {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface orderchart {
+  date: string;
+  ordersCount: number;
+}
+
 export interface item {
   id: number;
   product: product;
@@ -18,7 +24,23 @@ export interface item {
   price: number;
   status?: string;
 }
+export interface AdminDashboardData {
+  role: "admin";
+  totalOrders: number;
+  totalRevenue: number;
+  totalUsers: number;
+  totalSellers: number;
+  pendingOrders: number;
+}
 
+export interface SellerDashboardData {
+  role: "seller";
+  myOrders: number;
+  myRevenue: number;
+  myPendingOrders: number;
+}
+
+type CardsData = AdminDashboardData | SellerDashboardData;
 export async function getallorders(token: string | null): Promise<order[] | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/allorders", {
@@ -35,6 +57,50 @@ export async function getallorders(token: string | null): Promise<order[] | { er
 
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getOrdersCountChartData(token: string | null): Promise<orderchart[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getOrdersCountChartData", {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch data." };
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getcardsdata(token: string | null): Promise<CardsData | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getCardsData", {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch data." };
+    }
+
+    const data = await res.json();
+    return data as CardsData;
   } catch (error) {
     console.error("Error:", error);
     return { error: "An unexpected error occurred. Please try again later." };

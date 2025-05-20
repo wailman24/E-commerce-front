@@ -1,83 +1,66 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
+"use client";
 
+import { useContext, useEffect, useState } from "react";
+//import { getcardsdata } from "@/lib/api"; // adapte le chemin
+import { getcardsdata } from "../services/home/order"; // adapte le chemin
+import { Card, CardHeader, CardTitle, CardDescription, CardAction } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { IconTrendingUp } from "@tabler/icons-react";
+import { AppContext } from "../Context/AppContext";
 
 export function SectionCards() {
+  const appContext = useContext(AppContext);
+  if (!appContext) throw new Error("there is error in AppProvider");
+
+  const { token } = appContext;
+  const [cards, setCards] = useState<{ title: string; value: string | number }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getcardsdata(token);
+
+      if ("error" in data) {
+        setError(data.error);
+        return;
+      }
+
+      if (data.role === "admin") {
+        setCards([
+          { title: "Total Orders", value: data.totalOrders },
+          { title: "Total Revenue", value: `${data.totalRevenue.toLocaleString()} DA` },
+          { title: "Total Users", value: data.totalUsers },
+          { title: "total Sellers", value: data.totalSellers },
+        ]);
+      } else if (data.role === "seller") {
+        setCards([
+          { title: "My Orders", value: data.myOrders },
+          { title: "My Revenue", value: `${data.myRevenue.toLocaleString()} DA` },
+          { title: "Pending Orders", value: data.myPendingOrders },
+        ]);
+      }
+    }
+
+    fetchData();
+  }, [token]);
+
+  if (error) return <div className="p-4 text-red-500">⚠️ {error}</div>;
+
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">$1,250.00</CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Visitors for the last 6 months</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>New Customers</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">1,234</CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingDown />
-              -20%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period <IconTrendingDown className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Acquisition needs attention</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">45,678</CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">4.5%</CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +4.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
-        </CardFooter>
-      </Card>
+    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      {cards.map((card, index) => (
+        <Card key={index} className="@container/card" data-slot="card">
+          <CardHeader>
+            <CardDescription>{card.title}</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">{card.value}</CardTitle>
+            <CardAction>
+              <Badge variant="outline">
+                <IconTrendingUp />
+              </Badge>
+            </CardAction>
+          </CardHeader>
+        </Card>
+      ))}
     </div>
   );
 }
