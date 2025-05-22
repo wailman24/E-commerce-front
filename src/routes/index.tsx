@@ -28,6 +28,8 @@ import CategoryAddForm from "../pages/dashboardadmin/products/addcategory";
 import Categories from "../pages/dashboardadmin/products/categories";
 import AllOrders from "../pages/dashboardadmin/orders/allorders";
 import Items from "../pages/dashboardadmin/orders/items";
+import AdminPage from "../pages/dashboardadmin/dashboard";
+import ProductPage from "../pages/main/productpage";
 
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
@@ -56,7 +58,7 @@ function AppRoutes() {
               <Route path="/cart" element={<ShoppingCartPage />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/becomeseller" element={<BecomeSeller />} />
-
+              <Route path="/product/about" element={<ProductPage />} />
               {/* Add more protected routes here */}
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
@@ -71,7 +73,7 @@ function AppRoutes() {
             </Route>
 
             <Route element={<AdminLayout />}>
-              <Route path="/admindash" element={<Page />} />
+              <Route path="/admindash" element={<AdminPage />} />
               <Route path="/Admin/dashboard/users" element={<AllUsers />} />
               <Route path="/Admin/dashboard/allsellers" element={<Sellers />} />
               <Route path="/Admin/dashboard/sellers" element={<PendingSellers />} />

@@ -5,10 +5,54 @@ import { ChartAreaInteractive } from "../../components/chart-area-interactive";
 
 import { SiteHeader } from "../../components/site-header";
 import { SidebarInset, SidebarProvider } from "../../components/ui/sidebar";
+//import { ChartBars } from "../../components/chart-bars";
+import { AppContext } from "../../Context/AppContext";
+import { useContext, useEffect, useState } from "react";
+import { user } from "../auth/signup";
+import { getallusers } from "../../services/Auth/auth";
+import { DataTable } from "../../components/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 //import data from "./data.json";
 
-export default function Page() {
+export default function AdminPage() {
+  const appContext = useContext(AppContext);
+  if (!appContext) throw new Error("Products must be used within an AppProvider");
+
+  const { token } = appContext;
+  const [data, setData] = useState<user[]>([]);
+  //const [error, setError] = React.useState<string | null>(null);
+  useEffect(() => {
+    const fetchProds = async () => {
+      try {
+        const response = await getallusers(token);
+        if ("error" in response) {
+          setData([]);
+        } else {
+          setData(response);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+    fetchProds();
+  }, [token]);
+
+  const columns: ColumnDef<user>[] = [
+    {
+      accessorKey: "name",
+      header: "User Name",
+      //cell: ({ row }) => row.original.product.name,
+    },
+    {
+      accessorKey: "email",
+      header: "E-mail",
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
+    },
+  ];
   return (
     <SidebarProvider>
       {/* <AppSidebar variant="inset" /> */}
@@ -21,7 +65,8 @@ export default function Page() {
               <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />
               </div>
-              {/* <DataTable data={data} /> */}
+              {/* <ChartBars /> */}
+              <DataTable columns={columns} data={data} />
             </div>
           </div>
         </div>

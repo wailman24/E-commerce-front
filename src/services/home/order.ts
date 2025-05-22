@@ -34,10 +34,11 @@ export interface AdminDashboardData {
 }
 
 export interface SellerDashboardData {
+  myProducts: string | number;
   role: "seller";
   myOrders: number;
   myRevenue: number;
-  myPendingOrders: number;
+  pendingProducts: number;
 }
 
 type CardsData = AdminDashboardData | SellerDashboardData;

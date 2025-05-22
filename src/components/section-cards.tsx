@@ -34,9 +34,10 @@ export function SectionCards() {
         ]);
       } else if (data.role === "seller") {
         setCards([
+          { title: "My Products", value: data.myProducts },
           { title: "My Orders", value: data.myOrders },
           { title: "My Revenue", value: `${data.myRevenue.toLocaleString()} DA` },
-          { title: "Pending Orders", value: data.myPendingOrders },
+          { title: "Pending Products", value: data.pendingProducts },
         ]);
       }
     }
