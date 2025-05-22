@@ -1,64 +1,72 @@
-import React from 'react';
-
-type Image = {
-  url: string;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  categorie?: string;
-  about: string;
-  prix: number;
-  stock: number;
-  is_valid: boolean;
-  seller_id: number;
-  total_sold: number;
-  images: Image[];
-  reviewcount: number;
-  rating: number;
-};
+import React, { useState } from "react";
+import { product } from "../../services/home/product";
 
 type ProductDetailsProps = {
-  product: Product;
+  product: product | undefined;
 };
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(product?.images?.[0]?.image_url || null);
+
+  if (!product) {
+    return <p className="text-gray-400 italic">Loading...</p>;
+  }
+
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
-      {/* Left side - Product Images */}
-      <div className="space-y-4">
-        {product.images.map((img, index) => (
-          <img
-            key={index}
-            src={img.url}
-            alt={`Product image ${index + 1}`}
-            className="w-full rounded-xl shadow"
-          />
-        ))}
+    <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+      {/* Left - Image Gallery */}
+      <div className="flex gap-4">
+        <div className="flex flex-col gap-2 overflow-y-auto max-h-[400px]">
+          {product.images?.map((img) => (
+            <img
+              key={img.id}
+              src={`http://127.0.0.1:8000/storage/${img.image_url}`}
+              alt="Thumbnail"
+              onClick={() => setSelectedImage(img.image_url)}
+              className={`w-16 h-16 object-cover rounded border-2 cursor-pointer ${
+                selectedImage === img.image_url ? "border-blue-600" : "border-gray-200"
+              }`}
+            />
+          ))}
+        </div>
+        <div className="flex-1">
+          {selectedImage ? (
+            <img
+              src={`http://127.0.0.1:8000/storage/${selectedImage}`}
+              alt="Main"
+              className="w-full h-[350px] object-contain border rounded-lg shadow-md"
+            />
+          ) : (
+            <div className="w-full h-[350px] flex items-center justify-center border rounded-lg bg-gray-100 text-gray-500">
+              No image selected
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Right side - Product Info */}
+      {/* Right - Product Info */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-        <p className="text-xl text-blue-600 font-semibold mb-2">{product.prix} DZD</p>
+        <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
+        <p className="text-lg text-blue-600 font-semibold mb-2">{product.prix} DZD</p>
 
         <div className="flex items-center text-sm text-gray-600 mb-4">
-          <span className="text-yellow-500 mr-2">★ {product.rating.toFixed(1)}</span>
+          <span className="text-yellow-500 mr-2">★ {product.rating?.toFixed(1)}</span>
           <span>({product.reviewcount} reviews)</span>
         </div>
 
         <p className="text-gray-800 mb-6 whitespace-pre-line">{product.about}</p>
 
         <div className="text-sm text-gray-600 space-y-1">
-          <p><strong>Category:</strong> {product.categorie || 'N/A'}</p>
-          <p><strong>Stock:</strong> {product.stock}</p>
-          <p><strong>Sold:</strong> {product.total_sold}</p>
+          <p>
+            <strong>Category:</strong> {product.categorie}
+          </p>
+          <p>
+            <strong>Stock:</strong> {product.stock}
+          </p>
+          <p>
+            <strong>Sold:</strong> {product.total_sold}
+          </p>
         </div>
-
-        <button className="mt-6 bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
-          Add to Cart
-        </button>
       </div>
     </div>
   );

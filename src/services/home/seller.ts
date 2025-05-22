@@ -88,6 +88,28 @@ export async function getpendingsellers(token: string | null): Promise<seller[] 
   }
 }
 
+export async function getseller(token: string | null, user_id: number | undefined): Promise<seller | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/getseller/${user_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch seller." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
 export async function updatesellerstatus(token: string | null, sellerid: number, newstatus: string): Promise<seller | { error: string }> {
   try {
     const res = await fetch(`http://127.0.0.1:8000/api/updatesellerstatus/${sellerid}`, {

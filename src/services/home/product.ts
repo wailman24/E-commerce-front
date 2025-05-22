@@ -1,7 +1,8 @@
 export interface product {
   id: number;
   name?: string;
-  category_id: number;
+  categorie?: string;
+  categorie_id?: number;
   about?: string;
   prix: number;
   stock?: number;
@@ -22,9 +23,9 @@ export interface product {
   rating?: number;
 }
 
-export async function getproduct(token: string | null): Promise<product[] | { error: string }> {
+export async function getproduct(token: string | null, product_id: number): Promise<product | { error: string }> {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/getBestDealsProducts", {
+    const res = await fetch(`http://127.0.0.1:8000/api/getproduct/${product_id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -33,7 +34,7 @@ export async function getproduct(token: string | null): Promise<product[] | { er
     });
     if (!res.ok) {
       const error = await res.json();
-      return { error: error.message || "Failed to fetch best deal products." };
+      return { error: error.message || "Failed to fetch product." };
     }
 
     const data = await res.json();

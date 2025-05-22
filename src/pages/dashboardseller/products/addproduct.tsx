@@ -8,7 +8,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "../../../components/ui/select";
-import React,{ useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { addproduct, product } from "../../../services/home/product";
 import { AppContext } from "../../../Context/AppContext";
 import { category, getcategories } from "../../../services/home/category";
@@ -74,7 +74,7 @@ export default function ProductAddForm() {
 
     const prod: product = {
       name: data.name,
-      category_id: parseInt(data.category_id),
+      categorie_id: parseInt(data.category_id),
       about: data.about,
       prix: data.prix,
       stock: data.stock,
