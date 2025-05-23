@@ -30,7 +30,27 @@ export async function getcategories(token: string | null): Promise<category[] | 
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+export async function popularecatego(token: string | null): Promise<category[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getPopularCategories", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch categories." };
+    }
 
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error when getting categories:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
 export async function addcategory(token: string | null, dataitem: category): Promise<category | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/addcategory", {

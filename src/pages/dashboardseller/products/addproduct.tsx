@@ -74,7 +74,7 @@ export default function ProductAddForm() {
 
     const prod: product = {
       name: data.name,
-      categorie_id: parseInt(data.category_id),
+      category_id: parseInt(data.category_id),
       about: data.about,
       prix: data.prix,
       stock: data.stock,
@@ -86,7 +86,7 @@ export default function ProductAddForm() {
 
       if ("error" in result) {
         setError(result.error); // Set error message
-        console.log(error);
+        console.log("error:", error);
       } else {
         //setSuccess(true);
         console.log("Register product successful", result);

@@ -29,6 +29,8 @@ export default function ShoppingCartPage() {
         } else {
           setItems(response);
           setPaymentotal(response[0]?.order?.total || 0);
+          console.log("Fetched items response:", response);
+
           setError(null);
         }
       } catch (error) {
@@ -149,6 +151,11 @@ export default function ShoppingCartPage() {
       console.error(err);
     }
   };
+  useEffect(() => {
+    const total = items.reduce((sum, item) => sum + Number(item.price), 0);
+    setPaymentotal(total);
+  }, [items]);
+
   return (
     <div className="flex flex-col md:flex-row justify-between gap-8 p-6 md:p-10">
       {/* Left section - Items */}
@@ -175,16 +182,16 @@ export default function ShoppingCartPage() {
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-lg">{item.product.name}</h3>
-                    <p className="text-sm text-gray-600 mb-1">{item.product.category}</p>
+                    <p className="text-sm text-gray-600 mb-1">{item.product.categorie}</p>
 
                     <div className="text-sm text-gray-700 flex items-center gap-2 mb-1">
                       <span className="font-semibold text-yellow-500">{item.product.rating}</span>
-                      <span className="text-yellow-500">{"★".repeat(Math.round(item.product.rating))}</span>
+                      <span className="text-yellow-500">{"★".repeat(Math.round(item.product.rating!))}</span>
                       <span className="text-gray-500">({item.product.reviewcount} reviews)</span>
                     </div>
 
                     <p className="text-xs text-gray-500 mb-2">
-                      {item.product.category} • {item.product.stock! > 0 ? "In Stock" : "Out of Stock"}
+                      {item.product.categorie} • {item.product.stock! > 0 ? "In Stock" : "Out of Stock"}
                     </p>
                   </div>
 

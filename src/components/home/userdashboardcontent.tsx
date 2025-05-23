@@ -2,6 +2,7 @@ import React from "react";
 import UserProfileDetails from "./userprofile";
 import { seller } from "../../services/home/seller";
 import { user } from "../../pages/auth/signup";
+import OrdersList from "./orderList";
 
 type DashboardContentProps = {
   activeTab: string;
@@ -22,7 +23,7 @@ const UserDashboardContent: React.FC<DashboardContentProps> = ({ activeTab, user
       return (
         <div>
           <h2 className="text-2xl font-bold mb-4">Your Orders</h2>
-          <p>View your past and current orders here.</p>
+          <OrdersList />
         </div>
       );
     case "comments":

@@ -7,6 +7,7 @@ export interface order {
   total: number;
   status: string;
   is_done: boolean;
+  items: item[];
   created_at?: string;
   updated_at?: string;
 }
@@ -45,6 +46,28 @@ type CardsData = AdminDashboardData | SellerDashboardData;
 export async function getallorders(token: string | null): Promise<order[] | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/allorders", {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch orders." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function order_history(token: string | null): Promise<order[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/order_history", {
       method: "get",
       headers: {
         Authorization: `Bearer ${token}`,

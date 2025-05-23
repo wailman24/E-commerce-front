@@ -310,7 +310,7 @@ export default function Productseller() {
                 Category
               </Label>
               <Select
-                value={String(editProduct?.categorie_id ?? "")}
+                value={String(editProduct?.category_id ?? "")}
                 onValueChange={(value) => setEditProduct((prev) => prev && { ...prev, category_id: Number(value) })}
               >
                 <SelectTrigger id="category" className="mt-1">
