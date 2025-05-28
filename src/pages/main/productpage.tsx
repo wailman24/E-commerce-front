@@ -16,7 +16,7 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await getproduct(token, 1);
+        const response = await getproduct(token, 8);
         if (!("error" in response)) {
           setProductData(response);
         }
@@ -29,7 +29,7 @@ export default function ProductPage() {
       try {
         const rec = await getbestdealsproducts(token);
         if (!("error" in rec)) {
-          setRecommended(rec);
+          setRecommended(rec.slice(0, 4));
         }
       } catch (err) {
         console.error("Failed to fetch recommended products:", err);

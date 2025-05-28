@@ -1,4 +1,3 @@
-// components/settings/UserSettings.tsx
 import React, { useContext, useState } from "react";
 import { AppContext } from "../../Context/AppContext";
 import axios from "axios";
@@ -7,7 +6,7 @@ const UserSettings: React.FC = () => {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Must be used within AppProvider");
 
-  const { token, user } = appContext;
+  const { user, token } = appContext;
   const isSeller = user?.role_id === 2; // assuming 2 = seller
 
   const [form, setForm] = useState({
@@ -22,7 +21,7 @@ const UserSettings: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
-    if (files) {
+    if (files && files.length > 0) {
       setForm({ ...form, [name]: files[0] });
     } else {
       setForm({ ...form, [name]: value });
@@ -31,9 +30,24 @@ const UserSettings: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const formData = new FormData();
-      if (isSeller) {
+      // Update user info
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/updateuser/${user?.id}`,
+        {
+          name: form.name,
+          email: form.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (isSeller && user?.seller?.id) {
+        const formData = new FormData();
         formData.append("store", form.store);
         formData.append("phone", form.phone);
         formData.append("adress", form.adress);
@@ -42,59 +56,44 @@ const UserSettings: React.FC = () => {
           formData.append("logo", form.logo);
         }
 
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/updateseller/${user?.seller?.id}`, formData, {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/updateseller/${user.seller.id}`, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         });
-        alert("Seller profile updated!");
-      } else {
-        const res = await axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/updateuser/${user?.id}`,
-          {
-            name: form.name,
-            email: form.email,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        alert("User profile updated!");
       }
-    } catch (error: any) {
-      console.error(error);
-      alert("Update failed!");
+
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Update failed", error);
+      alert("Update failed. Check the console for details.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-xl mx-auto">
-      {!isSeller && (
-        <>
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
-          />
-        </>
-      )}
+      {/* User fields */}
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        value={form.name}
+        onChange={handleChange}
+        className="w-full border p-2 rounded"
+        required
+      />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={form.email}
+        onChange={handleChange}
+        className="w-full border p-2 rounded"
+        required
+      />
 
+      {/* Seller fields */}
       {isSeller && (
         <>
           <input
@@ -133,7 +132,13 @@ const UserSettings: React.FC = () => {
             className="w-full border p-2 rounded"
             required
           />
-          <input type="file" name="logo" accept="image/*" onChange={handleChange} className="w-full border p-2 rounded" />
+          <input
+            type="file"
+            name="logo"
+            accept="image/png, image/jpeg, image/jpg, image/svg+xml, image/gif"
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          />
         </>
       )}
 

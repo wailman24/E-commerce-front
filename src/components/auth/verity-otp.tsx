@@ -7,28 +7,11 @@ import { Button } from "../../components/ui/button";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AlertCircle, X } from "lucide-react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../components/ui/form";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "../../components/ui/input-otp";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { seller } from "../../services/home/seller";
 // Define OTP Schema
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -50,12 +33,7 @@ function getEmailProvider(email: string) {
   }
 }
 // OTP Form Component
-function InputOTPForm({
-  name,
-  email,
-  password,
-  closeOtp,
-}: user & { closeOtp: () => void }) {
+function InputOTPForm({ name, email, password, closeOtp }: user & { closeOtp: () => void }) {
   const [emailMessage, setEmailMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -73,14 +51,14 @@ function InputOTPForm({
     console.log(pin, name, email, password);
     try {
       const emailLink = getEmailProvider(email);
-      setEmailMessage(
-        `✅ A verification email has been sent to ${email}.\nOpen your email: ${emailLink}`
-      );
+      setEmailMessage(`✅ A verification email has been sent to ${email}.\nOpen your email: ${emailLink}`);
       const result = await VerifyOtp(
         {
           name,
           email,
           password,
+          id: 0,
+          seller: {} as seller,
         },
         pin
       );
@@ -101,18 +79,13 @@ function InputOTPForm({
   return (
     <div className="flex flex-col gap-6 relative">
       {/* ❌ Close button */}
-      <button
-        onClick={closeOtp}
-        className="absolute top-2 right-2 text-gray-500 hover:text-black"
-      >
+      <button onClick={closeOtp} className="absolute top-2 right-2 text-gray-500 hover:text-black">
         <X className="h-5 w-5" />
       </button>
       <Card>
         <CardHeader>
           <CardTitle>OTP Verification</CardTitle>
-          <CardDescription>
-            Enter the one-time password sent to your phone.
-          </CardDescription>
+          <CardDescription>Enter the one-time password sent to your phone.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -148,11 +121,7 @@ function InputOTPForm({
         <CardFooter>
           <p className="text-green-500">
             {emailMessage}{" "}
-            <a
-              href={getEmailProvider(email)}
-              target="_blank"
-              className="text-blue-500 underline"
-            >
+            <a href={getEmailProvider(email)} target="_blank" className="text-blue-500 underline">
               Open Email
             </a>
           </p>
@@ -170,20 +139,8 @@ function InputOTPForm({
 }
 
 // Main Component
-function Otpverification({
-  name,
-  email,
-  password,
-  closeOtp,
-}: user & { closeOtp: () => void }) {
-  return (
-    <InputOTPForm
-      name={name}
-      email={email}
-      password={password}
-      closeOtp={closeOtp}
-    />
-  );
+function Otpverification({ name, email, password, closeOtp }: user & { closeOtp: () => void }) {
+  return <InputOTPForm name={name} email={email} password={password} closeOtp={closeOtp} id={0} seller={{} as seller} />;
 }
 
 export default Otpverification;

@@ -74,12 +74,41 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 px-6">
-        {["Fast Shipping", "Best Offers", "Secure Payments", "24/7 Support"].map((feature) => (
-          <div key={feature} className="bg-white shadow rounded-2xl p-4 text-center">
-            <p className="font-semibold">{feature}</p>
-          </div>
-        ))}
+      {/* Features Section */}
+      <section className="px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            {
+              title: "Fast Shipping",
+              icon: "🚚",
+              description: "Get your orders quickly anywhere in Algeria.",
+            },
+            {
+              title: "Best Offers",
+              icon: "💰",
+              description: "Exclusive deals on top electronics.",
+            },
+            {
+              title: "Secure Payments",
+              icon: "🔒",
+              description: "Your transactions are safe and encrypted.",
+            },
+            {
+              title: "24/7 Support",
+              icon: "📞",
+              description: "We’re here to help anytime, any day.",
+            },
+          ].map((feature) => (
+            <div
+              key={feature.title}
+              className="bg-white shadow-sm hover:shadow-md transition rounded-2xl p-6 text-center flex flex-col items-center gap-2"
+            >
+              <div className="text-4xl">{feature.icon}</div>
+              <h3 className="font-semibold text-lg">{feature.title}</h3>
+              <p className="text-sm text-gray-600">{feature.description}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Popular Categories */}
@@ -154,6 +183,75 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      {/* Footer / About Section */}
+      <footer className="bg-gray-900 text-gray-300 px-6 py-12 mt-20">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* About */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">About Us</h3>
+            <p className="text-sm">
+              We are a leading Algerian e-commerce platform providing the best deals on electronics. Fast delivery, secure payment, and top
+              customer service — that’s our promise.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">Quick Links</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="/shop" className="hover:text-white">
+                  Shop
+                </a>
+              </li>
+              <li>
+                <a href="/categories" className="hover:text-white">
+                  Categories
+                </a>
+              </li>
+              <li>
+                <a href="/deals" className="hover:text-white">
+                  Best Deals
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="hover:text-white">
+                  Contact Us
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">Contact</h3>
+            <p className="text-sm">Email: support@yourstore.dz</p>
+            <p className="text-sm">Phone: +213 123 456 789</p>
+            <p className="text-sm">Algiers, Algeria</p>
+          </div>
+
+          {/* Social */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">Follow Us</h3>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-white">
+                Facebook
+              </a>
+              <a href="#" className="hover:text-white">
+                Instagram
+              </a>
+              <a href="#" className="hover:text-white">
+                Twitter
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center text-sm mt-12 border-t border-gray-700 pt-6">
+          &copy; {new Date().getFullYear()} Shop. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }
