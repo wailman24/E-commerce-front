@@ -3,19 +3,18 @@ import { AppContext } from "../../../Context/AppContext";
 import { getseller, seller } from "../../../services/home/seller";
 import UserDashboardContent from "../../../components/home/userdashboardcontent";
 
-// Tabs for the dashboard
 const tabs = [
   { id: "profile", label: "Profile" },
   { id: "orders", label: "Orders" },
   { id: "comments", label: "Comments" },
-  { id: "settings", label: "Settings" },
 ];
 
 export default function UserDashboardPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [seller, setSeller] = useState<seller>();
   const appContext = useContext(AppContext);
-  if (!appContext) throw new Error("Products must be used within an AppProvider");
+
+  if (!appContext) throw new Error("UserDashboardPage must be used within an AppProvider");
 
   const { user, token } = appContext;
   const uId = user?.id;
@@ -27,7 +26,7 @@ export default function UserDashboardPage() {
         const response = await getseller(token, uId);
         if (!("error" in response)) {
           setSeller(response);
-          console.log("SELLER RESPONSE", response); // <-- add this
+          console.log("SELLER RESPONSE", response);
         }
       } catch (error) {
         console.error("Failed to fetch seller:", error);
@@ -46,7 +45,10 @@ export default function UserDashboardPage() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                console.log("Clicked tab:", tab.id); // debug
+                setActiveTab(tab.id);
+              }}
               className={`block w-full text-left px-3 py-2 rounded-md font-medium ${
                 activeTab === tab.id ? "bg-blue-500 text-white" : "hover:bg-gray-200"
               }`}
@@ -58,7 +60,10 @@ export default function UserDashboardPage() {
       </aside>
 
       {/* Main Content */}
-      <section className="bg-white rounded-lg p-6 shadow-md min-h-[300px]">
+      <section
+        key={activeTab} // force re-render on tab switch
+        className="bg-white rounded-lg p-6 shadow-md min-h-[300px]"
+      >
         <UserDashboardContent activeTab={activeTab} user={user!} seller={seller} />
       </section>
     </div>

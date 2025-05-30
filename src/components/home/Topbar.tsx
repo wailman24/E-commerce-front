@@ -1,28 +1,46 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HeartIcon, User, ShoppingCartIcon } from "lucide-react";
 import CategoryDropdown from "../ui/CategoryDropdown";
-import { useContext } from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 import { AppContext } from "../../Context/AppContext";
+
 const Topbar = () => {
   const appContext = useContext(AppContext);
+  const navigate = useNavigate();
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { wishlistCount, cartCount, user } = appContext;
-  console.log(wishlistCount);
-  console.log("Role:", user?.role);
+  const { wishlistCount, cartCount, user, logout } = appContext;
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setShowDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logout(); // Call logout from context
+    navigate("/login");
+  };
+
   return (
     <header className="shadow">
       {/* Top White Bar */}
       <div className="bg-white px-6 py-3 flex items-center justify-between">
-        {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-orange-500">
           Shop<span className="text-black">O</span>
         </Link>
 
-        {/* Search */}
         <input type="text" placeholder="Search Product..." className="w-1/2 px-4 py-2 border rounded-full outline-none" />
 
-        {/* Become Seller */}
         <Link to="/becomeseller">
           <button className="bg-black text-white px-4 py-2 rounded-full text-sm">Become Seller</button>
         </Link>
@@ -30,12 +48,10 @@ const Topbar = () => {
 
       {/* Bottom Blue Bar */}
       <div className="bg-blue-700 text-white px-6 py-3 flex items-center justify-between">
-        {/* Left: Categories Dropdown */}
-        <div className="flex items-center gap-2  text-black">
+        <div className="flex items-center gap-2 text-black">
           <CategoryDropdown />
         </div>
 
-        {/* Center: Navigation Links */}
         <nav>
           <ul className="flex gap-6 text-sm font-medium">
             <li>
@@ -53,6 +69,7 @@ const Topbar = () => {
                 Products
               </Link>
             </li>
+
             {user?.role === "Seller" && (
               <li>
                 <Link to="/dash" className="hover:text-green-300">
@@ -68,6 +85,7 @@ const Topbar = () => {
                 </Link>
               </li>
             )}
+
             <li>
               <Link to="/faq" className="hover:text-green-300">
                 FAQ
@@ -76,8 +94,7 @@ const Topbar = () => {
           </ul>
         </nav>
 
-        {/* Right: Icons */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 relative" ref={dropdownRef}>
           <Link to="/wishlist">
             <div className="relative">
               <HeartIcon className="text-white w-6 h-6" />
@@ -88,6 +105,7 @@ const Topbar = () => {
               )}
             </div>
           </Link>
+
           <Link to="/cart">
             <div className="relative ml-4">
               <ShoppingCartIcon className="text-white w-6 h-6" />
@@ -98,9 +116,27 @@ const Topbar = () => {
               )}
             </div>
           </Link>
-          <Link to="/profile">
-            <User className="hover:text-green-300" />
-          </Link>
+
+          {/* User dropdown toggle */}
+          <div className="relative">
+            <button onClick={() => setShowDropdown(!showDropdown)} className="focus:outline-none">
+              <User className="text-white w-6 h-6 hover:text-green-300" />
+            </button>
+
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-2 z-50 text-black">
+                <Link to="/user/about" className="block px-4 py-2 hover:bg-gray-100">
+                  👤 Profile
+                </Link>
+                <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100">
+                  ⚙️ Settings
+                </Link>
+                <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100">
+                  🚪 Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

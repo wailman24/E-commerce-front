@@ -163,3 +163,34 @@ export async function deleteuser(token: string | null, user_id: number): Promise
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+
+export async function updateuser(
+  token: string | null,
+  data: { name: string; email: string; password: string | undefined }
+): Promise<user | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/updateuser", {
+      method: "PUT", // or "POST" depending on your route setup
+      headers: {
+        Authorization: `Bearer ${token || ""}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const response = await res.json();
+
+    if (!res.ok) {
+      return { error: response.message || "Failed to update user." };
+    }
+
+    if (!response || !response.user) {
+      return { error: "No user data returned from server." };
+    }
+
+    return response.user;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}

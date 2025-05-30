@@ -12,21 +12,22 @@ interface AppContextType {
   setWishlistCount: (wishlistCount: number) => void;
   cartCount: number;
   setCartCount: (cartCount: number) => void;
+  logout: () => void;
   //setUser: (user: string) => void;
 }
 export const AppContext = createContext<AppContextType | null>(null);
 
 export default function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<user | null>({
-    name: "",
-    email: "",
-    password: "",
-    role: "",
-  });
+  const [user, setUser] = useState<user | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [wishlistCount, setWishlistCount] = useState<number>(0);
   const [cartCount, setCartCount] = useState(0);
   //getuser(token);
+
+  const logout = () => {
+    localStorage.removeItem("token"); // or sessionStorage
+    setUser(null); // clear user state
+  };
 
   useEffect(() => {
     const fetchuser = async () => {
@@ -65,7 +66,7 @@ export default function AppProvider({ children }: { children: ReactNode }) {
     fetchCounts();
   }, [token]);
   return (
-    <AppContext.Provider value={{ token, setToken, user, wishlistCount, setWishlistCount, cartCount, setCartCount }}>
+    <AppContext.Provider value={{ token, setToken, user, wishlistCount, setWishlistCount, cartCount, setCartCount, logout }}>
       {children}
     </AppContext.Provider>
   );

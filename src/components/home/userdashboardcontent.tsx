@@ -12,6 +12,8 @@ type DashboardContentProps = {
 };
 
 const UserDashboardContent: React.FC<DashboardContentProps> = ({ activeTab, user, seller }) => {
+  console.log("ActiveTab in DashboardContent:", activeTab); // debug
+
   switch (activeTab) {
     case "profile":
       return (
@@ -30,19 +32,12 @@ const UserDashboardContent: React.FC<DashboardContentProps> = ({ activeTab, user
     case "comments":
       return (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Your Comment</h2>
-          <p>Comments you did.</p>
-        </div>
-      );
-    case "settings":
-      return (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Account Settings</h2>
+          <h2 className="text-2xl font-bold mb-4">Your Comments</h2>
           <UserSettings />
         </div>
       );
-    default:
-      return <p className="text-gray-500">Select a section from the menu.</p>;
+
+      return <p className="text-red-500">Unknown tab selected: {activeTab}</p>;
   }
 };
 

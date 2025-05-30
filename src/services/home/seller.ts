@@ -110,6 +110,38 @@ export async function getseller(token: string | null, user_id: number | undefine
   }
 }
 
+export async function updateseller(
+  token: string | null,
+  sellerId: number | undefined,
+  formData: FormData
+): Promise<seller | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/updateseller/${sellerId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token || ""}`,
+        // Don't set Content-Type manually when using FormData
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { error: data.message || "Failed to update seller." };
+    }
+
+    if (!data || !data.data) {
+      return { error: "No seller data returned from server." };
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error("Error during seller update:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
 export async function updatesellerstatus(token: string | null, sellerid: number, newstatus: string): Promise<seller | { error: string }> {
   try {
     const res = await fetch(`http://127.0.0.1:8000/api/updatesellerstatus/${sellerid}`, {

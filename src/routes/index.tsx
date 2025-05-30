@@ -31,6 +31,7 @@ import Items from "../pages/dashboardadmin/orders/items";
 import AdminPage from "../pages/dashboardadmin/dashboard";
 import ProductPage from "../pages/main/productpage";
 import UserDashboardPage from "../pages/main/user/dahboarduser";
+import UserSettings from "../components/home/usersetting";
 
 function AppRoutes() {
   const appContext = useContext(AppContext); // Handle null case properly
@@ -60,7 +61,8 @@ function AppRoutes() {
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/becomeseller" element={<BecomeSeller />} />
               <Route path="/product/about" element={<ProductPage />} />
-              <Route path="/userabout" element={<UserDashboardPage />} />
+              <Route path="/user/about" element={<UserDashboardPage />} />
+              <Route path="/user/settings" element={<UserSettings />} />
               {/* Add more protected routes here */}
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
