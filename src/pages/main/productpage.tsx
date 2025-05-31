@@ -4,6 +4,9 @@ import { getbestdealsproducts, getproduct, product } from "../../services/home/p
 import ProductDetails from "../../components/home/productabout";
 import PurchaseBox from "../../components/home/purchasebox";
 import RecommendedProducts from "../../components/home/recommendeprod";
+import { useParams } from "react-router-dom";
+import ProductReviews from "../../components/home/Reviews";
+import { getreviews, review } from "../../services/home/reviews";
 
 export default function ProductPage() {
   const appContext = useContext(AppContext);
@@ -12,11 +15,12 @@ export default function ProductPage() {
   const { token } = appContext;
   const [productData, setProductData] = useState<product>();
   const [recommended, setRecommended] = useState<product[]>([]);
-
+  const [reviews, setReviews] = useState<review[]>([]);
+  const params = useParams();
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await getproduct(token, 8);
+        const response = await getproduct(token, Number(params.id));
         if (!("error" in response)) {
           setProductData(response);
         }
@@ -36,9 +40,21 @@ export default function ProductPage() {
       }
     };
 
+    const fetchReviews = async () => {
+      try {
+        const rec = await getreviews(token, Number(params.id));
+        if (!("error" in rec)) {
+          setReviews(rec);
+        }
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      }
+    };
+
     fetchProduct();
     fetchRecommended();
-  }, [token]);
+    fetchReviews();
+  }, [token, params.id]);
 
   if (!productData) return <p className="text-center text-gray-500 mt-10">Loading product...</p>;
 
@@ -57,6 +73,7 @@ export default function ProductPage() {
 
       {/* Recommended Products */}
       <RecommendedProducts products={recommended} />
+      <ProductReviews reviews={reviews} />
     </div>
   );
 }
