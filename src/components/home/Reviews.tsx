@@ -21,12 +21,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // 🔄 Sync with parent reviews prop
   useEffect(() => {
     setLocalReviews(reviews);
   }, [reviews]);
 
-  // 🔁 Compute userReview each render
   const userReview = localReviews.find((r) => r.user?.id === user?.id);
 
   const handleEditClick = () => {
@@ -40,23 +38,21 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
     setComment("");
     setShowForm(true);
   };
+
   const handleDelete = async () => {
     if (!userReview) return;
-
     if (!window.confirm("Are you sure you want to delete your review?")) return;
 
     try {
       const res = await deletereview(token, userReview.id);
       if ("error" in res) {
         setError(res.error);
-        console.error(res.error);
       } else {
         setLocalReviews(localReviews.filter((r) => r.id !== userReview.id));
         setShowForm(false);
         setError(null);
       }
-    } catch (err) {
-      console.error("Failed to delete review:", err);
+    } catch {
       setError("Something went wrong while deleting.");
     }
   };
@@ -73,113 +69,109 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
         res = await addreview(token, Number(params.id), { rating, comment });
       }
 
-      if (res && "error" in res) {
+      if ("error" in res) {
         setError(res.error);
-        console.error(res.error);
       } else {
-        setError(null);
-        console.log("Review submitted successfully:", res);
         const reviewWithUser = {
           ...res,
-          user: user!, // Patch in current user if not returned from backend
+          user: user!,
         };
 
-        if (userReview) {
-          // 🔄 Update local review
-          const updatedList = localReviews.map((r) => (r.id === userReview.id ? reviewWithUser : r));
-          setLocalReviews(updatedList);
-        } else {
-          // ➕ Add new review
-          setLocalReviews([reviewWithUser, ...localReviews]);
-        }
+        const updatedReviews = userReview
+          ? localReviews.map((r) => (r.id === userReview.id ? reviewWithUser : r))
+          : [reviewWithUser, ...localReviews];
 
+        setLocalReviews(updatedReviews);
         setShowForm(false);
+        setError(null);
       }
-    } catch (err) {
-      console.error("Review submission failed:", err);
+    } catch {
       setError("Something went wrong.");
     }
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
+    <div className="mt-10">
+      <div className="bg-white p-6 rounded-xl shadow-md border space-y-6">
+        <h2 className="text-2xl font-bold">Customer Reviews</h2>
 
-      {/* Add or Edit Review Buttons */}
-      {!userReview && !showForm && (
-        <button onClick={handleAddClick} className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Add Review
-        </button>
-      )}
+        {/* Review Form - Always at the top */}
+        {showForm ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <label htmlFor="rating" className="font-medium">
+                Rating:
+              </label>
+              <select id="rating" value={rating} onChange={(e) => setRating(Number(e.target.value))} className="border rounded px-2 py-1">
+                {[1, 2, 3, 4, 5].map((r) => (
+                  <option key={r} value={r}>
+                    {r} ★
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Review List */}
-      {localReviews.length === 0 ? (
-        <p className="text-gray-500 italic">No reviews yet.</p>
-      ) : (
-        <div className="space-y-4 mb-4">
-          {localReviews.map((rev, index) => (
-            <div key={rev.id ?? `review-${index}`} className="border-b pb-4">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">{rev.user?.name || "Anonymous"}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400">{new Date(rev.updated_at ?? "").toLocaleDateString()}</span>
+            <textarea
+              className="w-full border rounded p-2"
+              rows={3}
+              placeholder="Write your comment..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              required
+            />
+
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
+            <div className="flex gap-4">
+              <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                {userReview ? "Update Review" : "Submit Review"}
+              </button>
+              <button type="button" onClick={() => setShowForm(false)} className="text-sm text-gray-500 underline">
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          !userReview && (
+            <button onClick={handleAddClick} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+              Add Review
+            </button>
+          )
+        )}
+
+        {/* Review List */}
+        {localReviews.length === 0 ? (
+          <p className="text-gray-500 italic">No reviews yet.</p>
+        ) : (
+          <div className="space-y-6 max-h-[300px] overflow-y-auto pr-2">
+            {localReviews.map((rev, i) => (
+              <div key={rev.id ?? `review-${i}`} className="bg-gray-50 p-4 rounded-md border shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-semibold text-lg">{rev.user?.name || "Anonymous"}</p>
+                    <p className="text-sm text-gray-400">{new Date(rev.updated_at ?? "").toLocaleDateString()}</p>
+                  </div>
                   {rev.user?.id === user?.id && !showForm && (
                     <div className="flex gap-2">
-                      <button onClick={handleEditClick} className="text-gray-500 hover:text-blue-600" title="Edit Review">
-                        <Pencil size={16} />
+                      <button onClick={handleEditClick} className="text-gray-500 hover:text-blue-600">
+                        <Pencil size={18} />
                       </button>
-                      <button onClick={handleDelete} className="text-gray-500 hover:text-red-600" title="Delete Review">
-                        <Trash size={16} />
+                      <button onClick={handleDelete} className="text-gray-500 hover:text-red-600">
+                        <Trash size={18} />
                       </button>
                     </div>
                   )}
                 </div>
+                <div className="text-yellow-500 text-lg leading-tight">
+                  {"★".repeat(rev.rating)}
+                  {"☆".repeat(5 - rev.rating)}
+                </div>
+                <p className="text-gray-700 mt-2">{rev.comment}</p>
               </div>
-              <div className="text-yellow-500">
-                {"★".repeat(rev.rating)}
-                {"☆".repeat(5 - rev.rating)}
-              </div>
-              <p className="text-gray-700 mt-1">{rev.comment}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Review Form */}
-      {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-3 mb-6">
-          <div className="flex items-center gap-2">
-            <label className="font-medium">Rating:</label>
-            <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="border px-2 py-1 rounded">
-              {[1, 2, 3, 4, 5].map((r) => (
-                <option key={r} value={r}>
-                  {r} ★
-                </option>
-              ))}
-            </select>
+            ))}
           </div>
-
-          <textarea
-            className="w-full border rounded p-2"
-            rows={3}
-            placeholder="Write your comment..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            required
-          />
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <div className="flex gap-2">
-            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              {userReview ? "Update Review" : "Submit Review"}
-            </button>
-            <button type="button" onClick={() => setShowForm(false)} className="text-sm text-gray-500 underline">
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
+        )}
+      </div>
     </div>
   );
 };
