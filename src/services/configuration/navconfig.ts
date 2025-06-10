@@ -78,7 +78,7 @@ export function getNavForAdmin(user: user) {
           { title: "Items Sold", url: "Admin/dashboard/items-sold" },
         ],
       },
-      { title: "Payout for Sellers", url: "#", icon: IconChartBar },
+      { title: "Payout for Sellers", url: "Admin/dashboard/payouts", icon: IconChartBar },
     ],
   };
 }

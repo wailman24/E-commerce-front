@@ -13,6 +13,7 @@ import { addproduct, product } from "../../../services/home/product";
 import { AppContext } from "../../../Context/AppContext";
 import { category, getcategories } from "../../../services/home/category";
 import { addimage } from "../../../services/home/image";
+import { notifyAdmin, sendPushNotification } from "../../../services/notif/notifyAdmin";
 //import { toast } from "../../../components/ui/use-toast";
 
 const formSchema = z.object({
@@ -91,6 +92,9 @@ export default function ProductAddForm() {
         //setSuccess(true);
         console.log("Register product successful", result);
         setProduct(result);
+
+        await notifyAdmin(result.name!); // for in-app
+        await sendPushNotification(result.id, result.name!); // for real push
       }
     } catch (err) {
       setError("An unexpected error occurred.");

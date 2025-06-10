@@ -39,6 +39,7 @@ import CategoryAddForm from "../pages/dashboardadmin/products/addcategory";
 import Categories from "../pages/dashboardadmin/products/categories";
 import AllOrders from "../pages/dashboardadmin/orders/allorders";
 import Items from "../pages/dashboardadmin/orders/items";
+import SellerPayouts from "../pages/dashboardadmin/payouts/payoutseller";
 
 function AppRoutes() {
   const appContext = useContext(AppContext);
@@ -97,6 +98,7 @@ function AppRoutes() {
             <Route path="/Admin/dashboard/orders" element={<AllOrders />} />
             <Route path="/Admin/dashboard/items-sold" element={<Items />} />
             <Route path="/Admin/dashboard/items-sold/:id" element={<Items />} />
+            <Route path="/Admin/dashboard/payouts" element={<SellerPayouts />} />
           </Route>
         </>
       )}

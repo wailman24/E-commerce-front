@@ -4,6 +4,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { getuser } from "../services/Auth/auth";
 import { getwishlist } from "../services/home/wishlist";
 import { getorderitems } from "../services/home/order";
+//import { requestFCMToken } from "../services/configuration/requestFCMToken";
 
 interface AppContextType {
   user: user | null;
@@ -34,41 +35,41 @@ export default function AppProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const fetchuser = async () => {
-      if (token) {
-        try {
-          const response = await getuser(token);
-          if (response?.data) {
-            setUser(response.data);
-          } else {
-            setUser(null);
-          }
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
+    const fetchUser = async () => {
+      if (!token) return setUser(null);
+
+      try {
+        const response = await getuser(token);
+        if (response?.data) {
+          setUser(response.data);
+          //await requestFCMToken(response.data.id, token);
+        } else {
           setUser(null);
-          setToken(null);
         }
-      } else {
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
         setUser(null);
+        setToken(null);
       }
     };
 
-    fetchuser();
+    fetchUser();
   }, [token]);
 
   useEffect(() => {
     const fetchCounts = async () => {
-      if (!token) return;
+      if (!token || !user) return;
 
       const wishlist = await getwishlist(token);
       if (!("error" in wishlist)) setWishlistCount(wishlist.length);
 
       const cart = await getorderitems(token);
       if (cart && !("error" in cart)) setCartCount(cart.length);
+      else setCartCount(0);
     };
 
     fetchCounts();
-  }, [token]);
+  }, [token, user]);
 
   return (
     <AppContext.Provider
