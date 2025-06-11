@@ -29,6 +29,7 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
 
       if (response && "error" in response) {
         setError(response.error);
+        console.error("Error adding to cart:", error);
       } else {
         if ("exists" in check && check.exists === false) {
           setCartCount(cartCount + 1);
@@ -140,8 +141,6 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
             >
               <ShoppingCart className="w-4 h-4" /> Add to Cart
             </Button>
-
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
         </div>
       )}

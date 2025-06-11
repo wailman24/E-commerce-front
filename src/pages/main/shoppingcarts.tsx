@@ -12,13 +12,13 @@ export default function ShoppingCartPage() {
   const [items, setItems] = useState<item[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [paymentotal, setPaymentotal] = useState<number>();
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const response = await getorderitems(token);
         if (!response) {
-          console.log("No response from server.");
           setItems([]);
           return;
         }
@@ -29,8 +29,6 @@ export default function ShoppingCartPage() {
         } else {
           setItems(response);
           setPaymentotal(response[0]?.order?.total || 0);
-          console.log("Fetched items response:", response);
-
           setError(null);
         }
       } catch (error) {
@@ -43,13 +41,11 @@ export default function ShoppingCartPage() {
 
   const handleInc = async (e: React.FormEvent, order_item: number) => {
     e.preventDefault();
-    setError(""); // Reset previous error
+    setError("");
 
     try {
       const response = await inc(token, order_item);
-
       if ("error" in response) {
-        console.log(error);
         setError(response.error);
       } else {
         setItems((prevItems) =>
@@ -58,24 +54,20 @@ export default function ShoppingCartPage() {
           )
         );
         setPaymentotal(response.order?.total);
-        console.log(response);
         setError(null);
       }
     } catch (err) {
-      setError("An unexpected error occurred.");
-      console.error(err);
+      setError("An unexpected error occurred: " + err);
     }
   };
 
   const handleDec = async (e: React.FormEvent, order_item: number) => {
     e.preventDefault();
-    setError(""); // Reset previous error
+    setError("");
 
     try {
       const response = await dec(token, order_item);
-
       if ("error" in response) {
-        console.log(error);
         setError(response.error);
       } else {
         setItems((prevItems) =>
@@ -84,81 +76,66 @@ export default function ShoppingCartPage() {
           )
         );
         setPaymentotal(response.order?.total);
-        console.log(response);
         setError(null);
       }
     } catch (err) {
-      setError("An unexpected error occurred.");
-      console.error(err);
+      setError("An unexpected error occurred: " + err);
     }
   };
 
   const handleDelete = async (e: React.FormEvent, order_item: number) => {
     e.preventDefault();
-    setError(""); // Reset previous error
+    setError("");
 
     try {
       const response = await deleteitem(token, order_item);
-
       if ("error" in response) {
-        console.log(error);
         setError(response.error);
       } else {
-        //Keep all items except the one whose id matches the deleted item's id.
         setItems((prevItems) => prevItems.filter((item) => item.id !== order_item));
         setPaymentotal(response.order?.total);
         setCartCount(cartCount - 1);
-        console.log(response);
         setError(null);
       }
     } catch (err) {
-      setError("An unexpected error occurred.");
-      console.error(err);
+      setError("An unexpected error occurred: " + err);
     }
   };
 
   const handleMovetoWishlist = async (e: React.FormEvent, product_id: number) => {
     e.preventDefault();
-    setError(""); // Reset previous error
+    setError("");
 
     try {
       const result = await isexist(token, product_id);
       if ("error" in result) {
-        console.log(result.error);
         setError(result.error);
         return;
       }
 
       if (!result.exists) {
-        //handleDelete(e, order_item);
-        //setCartCount(cartCount - 1);
         setWishlistCount(wishlistCount + 1);
         const response = await addtowishlist(token, { product_id });
 
         if ("error" in response) {
-          console.log(error);
           setError(response.error);
         } else {
-          //setItems((prevItems) => prevItems.filter((item) => item.product.id !== product_id));
-          console.log(response);
           setError(null);
         }
-      } else {
-        console.log("this product is already in the wishlist");
       }
     } catch (err) {
-      setError("An unexpected error occurred.");
-      console.error(err);
+      setError("An unexpected error occurred: " + err);
     }
   };
+
   useEffect(() => {
     const total = items.reduce((sum, item) => sum + Number(item.price), 0);
     setPaymentotal(total);
   }, [items]);
 
   return (
-    <div className="flex flex-col md:flex-row justify-between gap-8 p-6 md:p-10">
-      {/* Left section - Items */}
+    <div className="flex flex-col md:flex-row justify-between gap-8 p-6 md:p-10 relative z-0">
+      {/* Left Section */}
       <div className="w-full md:w-2/3">
         <h2 className="text-3xl font-bold mb-6">Shopping Cart</h2>
         <p className="font-semibold mb-4">
@@ -186,7 +163,7 @@ export default function ShoppingCartPage() {
 
                     <div className="text-sm text-gray-700 flex items-center gap-2 mb-1">
                       <span className="font-semibold text-yellow-500">{item.product.rating}</span>
-                      <span className="text-yellow-500">{"★".repeat(Math.round(item.product.rating!))}</span>
+                      <span className="text-yellow-500">{"★".repeat(Math.round(item.product.rating || 0))}</span>
                       <span className="text-gray-500">({item.product.reviewcount} reviews)</span>
                     </div>
 
@@ -209,22 +186,16 @@ export default function ShoppingCartPage() {
                   <p className="text-base font-bold mb-3">{item.price} DZD</p>
                   <div className="flex items-center justify-center border-2 border-blue-700 rounded-full px-3 py-1 hover:shadow-md transition">
                     <button
-                      //className="text-xl font-semibold px-2 hover:text-yellow-600 focus:outline-none"
-                      className={`text-xl px-2 ${
-                        item.qte == 1 ? "text-gray-400 cursor-not-allowed" : "font-semibold px-2 hover:text-yellow-600 focus:outline-none"
-                      }`}
+                      className={`text-xl px-2 ${item.qte === 1 ? "text-gray-400 cursor-not-allowed" : "hover:text-yellow-600"}`}
                       onClick={(e) => handleDec(e, item.id!)}
-                      disabled={item.qte == 1}
+                      disabled={item.qte === 1}
                     >
                       −
                     </button>
                     <span className="px-2 font-medium text-lg">{item.qte}</span>
                     <button
-                      //className="text-xl font-semibold px-2 hover:text-yellow-600 focus:outline-none"
                       className={`text-xl px-2 ${
-                        item.qte >= item.product.stock!
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "font-semibold px-2 hover:text-yellow-600 focus:outline-none"
+                        item.qte >= item.product.stock! ? "text-gray-400 cursor-not-allowed" : "hover:text-yellow-600"
                       }`}
                       onClick={(e) => handleInc(e, item.id!)}
                       disabled={item.qte >= item.product.stock!}
@@ -239,7 +210,7 @@ export default function ShoppingCartPage() {
         )}
       </div>
 
-      {/* Right section - Summary */}
+      {/* Right Section */}
       <div className="w-full md:w-1/3 mt-8 md:mt-0">
         <div className="bg-white border rounded-md p-6 shadow-md sticky top-24">
           <h4 className="font-bold text-lg mb-4">Order Summary</h4>
@@ -247,10 +218,44 @@ export default function ShoppingCartPage() {
             <p className="text-base">Total:</p>
             <p className="text-2xl font-bold">{paymentotal} DZD</p>
           </div>
-          <Button className="w-full bg-blue-700 hover:bg-blue-700 text-white py-2 text-sm">Proceed to Checkout</Button>
+          <Button className="w-full bg-blue-700 hover:bg-blue-700 text-white py-2 text-sm" onClick={() => setShowPaymentOptions(true)}>
+            Proceed to Checkout
+          </Button>
           <p className="text-xs text-gray-500 mt-2 text-center">You won't be charged yet</p>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {showPaymentOptions && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm z-[101]">
+            <h3 className="text-lg font-semibold mb-4 text-center">Choose your payment method</h3>
+            <div className="flex flex-col gap-4">
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => {
+                  setShowPaymentOptions(false);
+                  console.log("Payment on delivery selected");
+                }}
+              >
+                Payment on Delivery
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => {
+                  setShowPaymentOptions(false);
+                  console.log("Online payment selected");
+                }}
+              >
+                Pay Online
+              </Button>
+              <Button variant="ghost" onClick={() => setShowPaymentOptions(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

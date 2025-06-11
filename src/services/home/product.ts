@@ -23,6 +23,21 @@ export interface product {
   rating?: number;
 }
 
+export interface PaginatedProductResponse {
+  data: product[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    total: number;
+    per_page: number;
+    links?: {
+      first: string;
+      last: string;
+      prev: string | null;
+      next: string | null;
+    };
+  };
+}
 export async function getproduct(token: string | null, product_id: number): Promise<product | { error: string }> {
   try {
     const res = await fetch(`http://127.0.0.1:8000/api/getproduct/${product_id}`, {
@@ -111,22 +126,23 @@ export async function getnotvalidproductforadmin(token: string | null): Promise<
   }
 }
 
-export async function getallvalidproducts(token: string | null): Promise<product[] | { error: string }> {
+export async function getallvalidproducts(token: string | null, page: number = 1): Promise<PaginatedProductResponse | { error: string }> {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/getvalidproducts", {
+    const res = await fetch(`http://127.0.0.1:8000/api/getvalidproducts?page=${page}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
+
     if (!res.ok) {
       const error = await res.json();
       return { error: error.message || "Failed to fetch products." };
     }
 
-    const data = await res.json();
-    return data.data;
+    const data: PaginatedProductResponse = await res.json();
+    return data;
   } catch (error) {
     console.error("Error during process:", error);
     return { error: "An unexpected error occurred. Please try again later." };

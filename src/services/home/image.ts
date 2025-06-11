@@ -10,20 +10,21 @@ export async function addimage(token: string | null, product_id: number, file: F
   try {
     const formData = new FormData();
     formData.append("product_id", product_id.toString());
-    formData.append("image_url", file); // ✅ must match Laravel validation rule
+    formData.append("image", file); // ✅ FIXED here
 
     const res = await fetch("http://127.0.0.1:8000/api/addimage", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        // DO NOT SET Content-Type when using FormData
+        // ✅ DO NOT manually set Content-Type for FormData
       },
       body: formData,
     });
 
     const data = await res.json();
+
     if (!res.ok) {
-      return { error: data.message || "Failed to upload image." };
+      return { error: data?.error || data?.message || "Failed to upload image." };
     }
 
     return data.DATA;

@@ -10,6 +10,15 @@ export interface SellerPayout {
   updated_at?: string;
 }
 
+export interface Payouts {
+  id: number;
+  seller_id: number;
+  amount_paid: number;
+  batch_id: string;
+  paid_at?: string;
+  created_at?: string;
+}
+
 export async function getPendingPayouts(token: string): Promise<SellerPayout[] | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/getallsellerearnings", {
@@ -51,6 +60,28 @@ export async function paySeller(token: string, sellerId: number) {
     return data.data;
   } catch (error) {
     console.error("Error during :", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getsellerpayout(token: string): Promise<Payouts[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getMyPayouts", {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch payouts." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }

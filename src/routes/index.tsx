@@ -40,6 +40,7 @@ import Categories from "../pages/dashboardadmin/products/categories";
 import AllOrders from "../pages/dashboardadmin/orders/allorders";
 import Items from "../pages/dashboardadmin/orders/items";
 import SellerPayouts from "../pages/dashboardadmin/payouts/payoutseller";
+import Payouts from "../pages/dashboardseller/finance/payouts";
 
 function AppRoutes() {
   const appContext = useContext(AppContext);
@@ -83,6 +84,7 @@ function AppRoutes() {
             <Route path="/dashboard/product" element={<Productseller />} />
             <Route path="/dashboard/NotValidProduct" element={<NotvalidProductseller />} />
             <Route path="/dashboard/order" element={<Orderseller />} />
+            <Route path="/dashboard/finance" element={<Payouts />} />
           </Route>
 
           {/* Admin Layout */}

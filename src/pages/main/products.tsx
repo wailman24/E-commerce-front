@@ -10,39 +10,43 @@ export default function Products() {
   const { token } = appContext;
 
   const [vproducts, setVProducts] = useState<product[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Filters
-  const [minPrice, setMinPrice] = useState<string>("");
-  const [maxPrice, setMaxPrice] = useState<string>("");
-  const [minRating, setMinRating] = useState<number>(0);
-  const [availableOnly, setAvailableOnly] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [minRating, setMinRating] = useState(0);
+  const [availableOnly, setAvailableOnly] = useState(false);
 
   useEffect(() => {
     const fetchVP = async () => {
       try {
         setLoading(true);
-        const response = await getallvalidproducts(token);
+        const response = await getallvalidproducts(token, currentPage);
+
         if ("error" in response) {
           setError(response.error);
           setVProducts([]);
         } else {
-          setVProducts(response);
-          console.log(response);
+          setVProducts(response.data);
+          setLastPage(response.meta.last_page);
           setError(null);
         }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to fetch data.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchVP();
-  }, [token]);
+  }, [token, currentPage]);
 
-  // Apply filters
+  // Filter logic
   const filteredProducts = vproducts.filter((product) => {
     const price = product.prix ?? 0;
     const rating = product.rating ?? 0;
@@ -51,20 +55,20 @@ export default function Products() {
     const min = minPrice ? parseFloat(minPrice) : 0;
     const max = maxPrice ? parseFloat(maxPrice) : Infinity;
 
-    const isInPriceRange = price >= min && price <= max;
-    const hasMinRating = rating >= minRating;
-    const isAvailable = !availableOnly || stock > 0;
+    const inPriceRange = price >= min && price <= max;
+    const meetsRating = rating >= minRating;
+    const inStock = !availableOnly || stock > 0;
 
-    return isInPriceRange && hasMinRating && isAvailable;
+    return inPriceRange && meetsRating && inStock;
   });
 
   return (
     <section className="px-6 py-4">
       <h2 className="text-2xl font-bold mb-6">Best Deals {error && `- ${error}`}</h2>
 
-      <div className="flex gap-6">
-        {/* Filters Sidebar */}
-        <div className="w-full sm:w-1/4 border rounded p-4 space-y-4 bg-white shadow">
+      <div className="flex flex-col sm:flex-row gap-6">
+        {/* Filter Panel */}
+        <div className="w-full sm:w-1/4 border rounded p-4 bg-white shadow space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Min Price</label>
             <input
@@ -104,24 +108,43 @@ export default function Products() {
           </div>
         </div>
 
-        {/* Products Grid */}
-        {loading ? (
-          <h1>loader</h1>
-        ) : (
-          <div className="w-full sm:w-3/4">
-            {filteredProducts.length === 0 ? (
-              <p>No products match your filters.</p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                <>
-                  {filteredProducts.map((product) => (
-                    <Prodcards key={product.id} {...product} />
-                  ))}
-                </>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Product Grid */}
+        <div className="w-full sm:w-3/4">
+          {loading ? (
+            <p>Loading...</p>
+          ) : filteredProducts.length === 0 ? (
+            <p>No products match your filters.</p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {filteredProducts.map((product) => (
+                <Prodcards key={product.id} {...product} />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && filteredProducts.length > 0 && (
+            <div className="flex justify-center items-center mt-6 gap-4">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage} of {lastPage}
+              </span>
+              <button
+                disabled={currentPage === lastPage}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, lastPage))}
+                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

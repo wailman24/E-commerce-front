@@ -30,7 +30,7 @@ export function getNavForSeller(user: user) {
         icon: IconFolder,
         items: [{ title: "All Orders", url: "/dashboard/order" }],
       },
-      { title: "Finance", url: "#", icon: IconChartBar },
+      { title: "Finance", url: "/dashboard/finance", icon: IconChartBar },
     ],
   };
 }
