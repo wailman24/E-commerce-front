@@ -42,7 +42,7 @@ export default function AllOrders() {
   const navigate = useNavigate();
 
   const handleAbout = async (id: number) => {
-    console.log("user with ID:", id);
+    console.log("order with ID:", id);
     navigate(`/Admin/dashboard/items-sold/${id}`);
   };
 
@@ -53,8 +53,8 @@ export default function AllOrders() {
       cell: ({ row }) => row.original.user?.name,
     },
     {
-      accessorKey: "adress_delivery",
-      header: "Delevery Address",
+      accessorKey: "address_delivery",
+      header: "Delivery Address",
     },
     {
       accessorKey: "status",

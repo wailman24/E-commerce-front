@@ -10,6 +10,7 @@ import {
 } from "../../../components/ui/dropdown-menu";
 //import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 //import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { useNavigate } from "react-router-dom";
 
 import { MoreVerticalIcon } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -24,6 +25,8 @@ export default function AllUsers() {
   const { token } = appContext;
   const [data, setData] = React.useState<user[]>([]);
   const [error, setError] = React.useState<string | null>(null);
+  const navigate = useNavigate();
+
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
@@ -40,9 +43,9 @@ export default function AllUsers() {
     fetchProds();
   }, [token]);
 
-  const handleAbout = async (id: number) => {
-    console.log("user with ID:", id);
-    // Handle the action for the selected user here
+  const handleAbout = (id: number) => {
+    console.log("Navigating to user with ID:", id);
+    navigate(`/user/about/${id}`);
   };
 
   const handleDelete = async (id: number) => {

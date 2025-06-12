@@ -6,7 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from ".
 import { MoreVerticalIcon } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
-import { getpendingsellers, seller, updatesellerstatus } from "../../../services/home/seller";
+import { deleteseller, getpendingsellers, seller, updatesellerstatus } from "../../../services/home/seller";
 
 export default function PendingSellers() {
   const appContext = React.useContext(AppContext);
@@ -38,6 +38,22 @@ export default function PendingSellers() {
       setData((prevData) => prevData.map((seller) => (seller.id === sellerId ? { ...seller, status: newStatus } : seller)));
     } catch (err) {
       console.error("Error updating status:", err);
+    }
+  };
+  const handleDelete = async (id: number) => {
+    const confirmed = window.confirm("Are you sure you want to delete this seller?");
+    if (!confirmed) return;
+
+    try {
+      const response = await deleteseller(token!, id);
+      if (!("error" in response)) {
+        // Remove the deleted seller from local state
+        setData((prev) => prev.filter((s) => s.id !== id));
+      } else {
+        console.error("Delete failed:", response.error);
+      }
+    } catch (error) {
+      console.error("Failed to delete seller:", error);
     }
   };
 
@@ -111,10 +127,10 @@ export default function PendingSellers() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                console.log("About seller ID:", row.original.id);
+                handleDelete(row.original.id);
               }}
             >
-              About
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

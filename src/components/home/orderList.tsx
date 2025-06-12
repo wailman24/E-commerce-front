@@ -3,6 +3,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../Context/AppContext";
 import { order, order_history } from "../../services/home/order";
+import { useParams } from "react-router-dom";
 
 const OrdersList: React.FC = () => {
   const appContext = useContext(AppContext);
@@ -11,11 +12,11 @@ const OrdersList: React.FC = () => {
   const { token } = appContext;
   const [orders, setOrders] = useState<order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const { id } = useParams();
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await order_history(token);
+        const response = await order_history(token, Number(id));
         if ("error" in response) {
           setOrders([]);
         } else {
@@ -29,7 +30,7 @@ const OrdersList: React.FC = () => {
     };
 
     fetchOrders();
-  }, [token]);
+  }, [token, id]);
 
   if (loading) {
     return <p className="text-gray-500 text-sm">Loading your orders...</p>;
@@ -63,7 +64,7 @@ const OrdersList: React.FC = () => {
 
           <div className="text-sm text-gray-600 space-y-1">
             <p>
-              <strong>Delivery Address:</strong> {order.adress_delivery}
+              <strong>Delivery Address:</strong> {order.address_delivery}
             </p>
             <p>
               <strong>Total:</strong> {order.total} DA

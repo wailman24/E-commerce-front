@@ -10,7 +10,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
 //import { user } from "../../../pages/auth/signup";
 //import { getallusers } from "../../../services/Auth/auth";
-import { getallseller, seller } from "../../../services/home/seller";
+import { deleteseller, getallseller, seller } from "../../../services/home/seller";
 
 export default function Sellers() {
   const appContext = React.useContext(AppContext);
@@ -35,9 +35,21 @@ export default function Sellers() {
     fetchProds();
   }, [token]);
 
-  const handleAbout = async (id: number) => {
-    console.log("user with ID:", id);
-    // Handle the action for the selected user here
+  const handleDelete = async (id: number) => {
+    const confirmed = window.confirm("Are you sure you want to delete this seller?");
+    if (!confirmed) return;
+
+    try {
+      const response = await deleteseller(token!, id);
+      if (!("error" in response)) {
+        // Remove the deleted seller from local state
+        setData((prev) => prev.filter((s) => s.id !== id));
+      } else {
+        console.error("Delete failed:", response.error);
+      }
+    } catch (error) {
+      console.error("Failed to delete seller:", error);
+    }
   };
   const columns: ColumnDef<seller>[] = [
     {
@@ -78,10 +90,10 @@ export default function Sellers() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                handleAbout(row.original.id);
+                handleDelete(row.original.id);
               }}
             >
-              About
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

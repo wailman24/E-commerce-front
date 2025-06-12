@@ -3,7 +3,7 @@ import { product } from "./product";
 export interface order {
   id: number;
   user?: user;
-  adress_delivery?: string;
+  address_delivery?: string;
   total: number;
   status: string;
   is_done: boolean;
@@ -24,6 +24,8 @@ export interface item {
   qte: number;
   price: number;
   status?: string;
+  order_id?: number;
+  adress_delivery?: string;
 }
 export interface AdminDashboardData {
   role: "admin";
@@ -65,9 +67,9 @@ export async function getallorders(token: string | null): Promise<order[] | { er
   }
 }
 
-export async function order_history(token: string | null): Promise<order[] | { error: string }> {
+export async function order_history(token: string | null, id: number): Promise<order[] | { error: string }> {
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/order_history", {
+    const res = await fetch(`http://127.0.0.1:8000/api/order_history/${id}`, {
       method: "get",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -274,21 +276,27 @@ export async function isexistincart(token: string | null, product_id: number): P
         "Content-Type": "application/json",
       },
     });
-    if (!res.ok) {
-      const error = await res.json();
-      return { error: error.message || "Failed to fetch orders." };
+
+    let data = null;
+
+    try {
+      data = await res.json(); // Try parsing the JSON only if it's there
+    } catch {
+      console.warn("Empty or invalid JSON response");
     }
 
-    const data = await res.json();
-    if (typeof data.data === "boolean") {
+    if (!res.ok) {
+      const errorMsg = data?.message || "Failed to fetch orders.";
+      return { error: errorMsg };
+    }
+
+    if (typeof data?.data === "boolean") {
       return { exists: data.data };
     }
 
     return { exists: false };
-
-    //return data.data;
   } catch (error) {
-    console.error("Error during :", error);
+    console.error("Error during isexistincart:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
@@ -324,6 +332,29 @@ export async function updateitemstatus(token: string | null, order_item: number,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ status }),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch order." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function updateadressdelivery(token: string | null, order_id: number, address: string): Promise<order | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/updateadressdelivery/${order_id}`, {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ adress_delivery: address }),
     });
     if (!res.ok) {
       const error = await res.json();

@@ -12,7 +12,7 @@ type DashboardContentProps = {
 };
 
 const UserDashboardContent: React.FC<DashboardContentProps> = ({ activeTab, user, seller }) => {
-  console.log("ActiveTab in DashboardContent:", activeTab); // debug
+  console.log("ActiveTab in DashboardContent:", user); // debug
 
   switch (activeTab) {
     case "profile":

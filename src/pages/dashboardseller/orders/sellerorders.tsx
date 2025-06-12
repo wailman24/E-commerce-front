@@ -28,6 +28,7 @@ export default function Orderseller() {
           setData([]);
         } else {
           setData(response);
+          console.log(response);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -62,6 +63,11 @@ export default function Orderseller() {
       accessorKey: "product",
       header: "Product Name",
       cell: ({ row }) => row.original.product.name,
+    },
+    {
+      accessorKey: "adress_delivery",
+      header: "Delivery Address",
+      cell: ({ row }) => row.original.adress_delivery || "N/A",
     },
     {
       accessorKey: "price",

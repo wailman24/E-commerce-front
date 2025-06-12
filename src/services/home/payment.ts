@@ -2,6 +2,7 @@
 
 export interface SellerPayout {
   id: number;
+  seller_id: number;
   seller_name: string;
   seller_email: string;
   unpaid_amount: number;
@@ -13,10 +14,39 @@ export interface SellerPayout {
 export interface Payouts {
   id: number;
   seller_id: number;
+  seller_email: string;
   amount_paid: number;
   batch_id: string;
   paid_at?: string;
   created_at?: string;
+}
+
+export async function createPayment(token: string, order_id: number): Promise<{ token: string; approval_url: string } | { error: string }> {
+  try {
+    console.log(" order:", { order_id });
+    const res = await fetch(`http://127.0.0.1:8000/api/payment`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ order_id }), // ✅ wrap in object
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { error: data.message || "Failed to create payment." };
+    }
+
+    return {
+      token: data.token,
+      approval_url: data.approval_url,
+    };
+  } catch (error) {
+    console.error("Error during payment creation:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
 }
 
 export async function getPendingPayouts(token: string): Promise<SellerPayout[] | { error: string }> {
@@ -83,5 +113,27 @@ export async function getsellerpayout(token: string): Promise<Payouts[] | { erro
   } catch (error) {
     console.error("Error:", error);
     return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function payOnDelivery(orderId: number, token: string | null) {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/paymentondelivery/${orderId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Payment failed");
+    }
+
+    return { success: true, message: data.message };
+  } catch (error) {
+    return { success: false, message: error };
   }
 }

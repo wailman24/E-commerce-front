@@ -41,6 +41,9 @@ import AllOrders from "../pages/dashboardadmin/orders/allorders";
 import Items from "../pages/dashboardadmin/orders/items";
 import SellerPayouts from "../pages/dashboardadmin/payouts/payoutseller";
 import Payouts from "../pages/dashboardseller/finance/payouts";
+import PaymentCancel from "../pages/main/payment/paymentcancel";
+import PaymentSuccess from "../pages/main/payment/paymentsuccess";
+import FeedbackForm from "../pages/main/faq";
 
 function AppRoutes() {
   const appContext = useContext(AppContext);
@@ -73,7 +76,12 @@ function AppRoutes() {
             <Route path="/becomeseller" element={<BecomeSeller />} />
             <Route path="/product/about/:id" element={<ProductPage />} />
             <Route path="/user/about" element={<UserDashboardPage />} />
+            <Route path="/user/about/:id" element={<UserDashboardPage />} />
             <Route path="/user/settings" element={<UserSettings />} />
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/FAQ" element={<FeedbackForm />} />
+            {/* Nested routes for user dashboard */}
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>
 

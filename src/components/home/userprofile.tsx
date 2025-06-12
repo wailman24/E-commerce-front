@@ -8,6 +8,8 @@ type Props = {
 };
 
 const UserProfileDetails: React.FC<Props> = ({ user, seller }) => {
+  console.log("UserProfileDetails component loaded with user:", user); // debug
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Seller Info (if available) */}

@@ -15,6 +15,7 @@ import { deleteproductAdmin, getnotvalidproductforadmin, product, updateproducts
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
 //import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductPending() {
   const appContext = React.useContext(AppContext);
@@ -26,6 +27,7 @@ export default function ProductPending() {
   //const [editProduct, setEditProduct] = React.useState<product | null>(null);
 
   const [error, setError] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const fetchProds = async () => {
@@ -49,15 +51,6 @@ export default function ProductPending() {
 
     fetchProds();
   }, [token]);
-
-  const handleView = (id: number) => {
-    const selectedProduct = data.find((prod) => prod.id === id);
-    if (selectedProduct) {
-      //setEditProduct(selectedProduct);
-      // setShowForm(true);
-      console.log("befor click: ", selectedProduct);
-    }
-  };
 
   const handleStatusChange = async (productId: number, newStatus: boolean) => {
     try {
@@ -87,6 +80,13 @@ export default function ProductPending() {
     }
   };
 
+  const handleView = (id: number) => {
+    const selectedProduct = data.find((prod) => prod.id === id);
+    if (selectedProduct) {
+      navigate(`/product/about/${id}`);
+      console.log("befor click: ", selectedProduct);
+    }
+  };
   const columns: ColumnDef<product>[] = [
     {
       id: "drag",
@@ -96,6 +96,17 @@ export default function ProductPending() {
     {
       accessorKey: "name",
       header: "Product Name",
+      cell: ({ row }) => {
+        const name: string = row.original.name || "";
+        const words = name.split(" ");
+        const truncated = words.slice(0, 4).join(" ");
+        return (
+          <span title={name}>
+            {truncated}
+            {words.length > 4 ? "..." : ""}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "prix",

@@ -208,6 +208,17 @@ export default function Productseller() {
     {
       accessorKey: "name",
       header: "Product Name",
+      cell: ({ row }) => {
+        const name: string = row.original.name || "";
+        const words = name.split(" ");
+        const truncated = words.slice(0, 4).join(" ");
+        return (
+          <span title={name}>
+            {truncated}
+            {words.length > 4 ? "..." : ""}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "prix",

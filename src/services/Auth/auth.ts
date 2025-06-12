@@ -194,3 +194,28 @@ export async function updateuser(
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+
+export async function getuserbyid(token: string, id: number): Promise<user | { error: string }> {
+  const res = await fetch(`http://127.0.0.1:8000/api/getuserbyid/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text(); // Read as plain text for debugging
+    console.error("Failed to fetch user:", text);
+    return { error: `Failed to fetch user: ${res.status}` };
+  }
+
+  const json = await res.json();
+
+  // Ensure API response structure matches expected format
+  if (json && json.data) {
+    return json.data as user;
+  }
+
+  return { error: "Invalid response format from server" };
+}

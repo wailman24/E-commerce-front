@@ -3,7 +3,7 @@ import { DataTable } from "../../../components/data-table";
 import { Button } from "../../../components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  //DropdownMenuContent,
   //DropdownMenuItem,
   //  DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -31,12 +31,14 @@ export default function Items() {
     const fetchItems = async () => {
       try {
         const response = await getallitems(token);
+        console.log("Full items response:", response);
+
         if ("error" in response) {
           setData([]);
         } else {
           // If an ID is provided, filter items by order_id
           if (id) {
-            const filtered = response.filter((item) => item.order?.id === Number(id));
+            const filtered = response.filter((item) => item.order_id === Number(id));
             setData(filtered);
           } else {
             setData(response);
@@ -54,7 +56,18 @@ export default function Items() {
     {
       accessorKey: "product",
       header: "Product Name",
-      cell: ({ row }) => row.original.product?.name,
+
+      cell: ({ row }) => {
+        const name: string = row.original.product?.name || "";
+        const words = name.split(" ");
+        const truncated = words.slice(0, 4).join(" ");
+        return (
+          <span title={name}>
+            {truncated}
+            {words.length > 4 ? "..." : ""}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "qte",
@@ -78,10 +91,6 @@ export default function Items() {
               <MoreVerticalIcon />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {/*             <DropdownMenuItem onClick={() => handleAbout(row.original.id!)}>About</DropdownMenuItem>
-             */}{" "}
-          </DropdownMenuContent>
         </DropdownMenu>
       ),
     },

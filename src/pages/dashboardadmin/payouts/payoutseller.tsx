@@ -25,7 +25,7 @@ export default function SellerPayouts() {
           setData([]);
         } else {
           setData(response);
-          console.log(response);
+          console.log("payouts ", response);
           //setError(null);
         }
       } catch (error) {
@@ -44,6 +44,11 @@ export default function SellerPayouts() {
 
     try {
       const result = await paySeller(token!, sellerId);
+
+      if (!result) {
+        console.error("Payout API returned null");
+        return;
+      }
 
       if (result && "error" in result) {
         console.error(result.error);
@@ -88,7 +93,7 @@ export default function SellerPayouts() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <Button size="sm" className="cursor-pointer" onClick={() => handlePayout(row.original.id)}>
+        <Button size="sm" className="cursor-pointer" onClick={() => handlePayout(row.original.seller_id)}>
           Pay
         </Button>
       ),

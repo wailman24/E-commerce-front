@@ -167,3 +167,20 @@ export async function updatesellerstatus(token: string | null, sellerid: number,
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }
+
+export async function deleteseller(token: string, id: number): Promise<{ success: boolean } | { error: string }> {
+  const res = await fetch(`http://127.0.0.1:8000/api/deleteseller/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    return { error: text };
+  }
+
+  return { success: true };
+}

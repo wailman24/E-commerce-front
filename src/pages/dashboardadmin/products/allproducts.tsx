@@ -15,6 +15,7 @@ import { deleteproductAdmin, getallproducts, product, updateproductstatus } from
 import { ColumnDef } from "@tanstack/react-table";
 import { AppContext } from "../../../Context/AppContext";
 //import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "../../../components/ui/drawer";
+import { useNavigate } from "react-router-dom";
 
 export default function AllProducts() {
   const appContext = React.useContext(AppContext);
@@ -26,6 +27,7 @@ export default function AllProducts() {
   //const [editProduct, setEditProduct] = React.useState<product | null>(null);
 
   const [error, setError] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const fetchProds = async () => {
@@ -53,8 +55,7 @@ export default function AllProducts() {
   const handleView = (id: number) => {
     const selectedProduct = data.find((prod) => prod.id === id);
     if (selectedProduct) {
-      //setEditProduct(selectedProduct);
-      // setShowForm(true);
+      navigate(`/product/about/${id}`);
       console.log("befor click: ", selectedProduct);
     }
   };
@@ -96,6 +97,17 @@ export default function AllProducts() {
     {
       accessorKey: "name",
       header: "Product Name",
+      cell: ({ row }) => {
+        const name: string = row.original.name || "";
+        const words = name.split(" ");
+        const truncated = words.slice(0, 4).join(" ");
+        return (
+          <span title={name}>
+            {truncated}
+            {words.length > 4 ? "..." : ""}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "prix",
