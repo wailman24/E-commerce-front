@@ -1,16 +1,16 @@
-import { IconCreditCard, IconDotsVertical, IconLogout, IconNotification, IconUserCircle } from "@tabler/icons-react";
+import { IconDotsVertical } from "@tabler/icons-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  //  DropdownMenuContent,
+  // DropdownMenuGroup,
+  //DropdownMenuItem,
+  //DropdownMenuLabel,
+  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "../components/ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../components/ui/sidebar";
 
 export function NavUser({
   user,
@@ -21,7 +21,7 @@ export function NavUser({
     avatar: string;
   };
 }) {
-  const { isMobile } = useSidebar();
+  // const { isMobile } = useSidebar();
 
   return (
     <SidebarMenu>
@@ -40,7 +40,7 @@ export function NavUser({
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
+          {/*   <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
@@ -78,7 +78,7 @@ export function NavUser({
               <IconLogout />
               Log out
             </DropdownMenuItem>
-          </DropdownMenuContent>
+          </DropdownMenuContent> */}
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

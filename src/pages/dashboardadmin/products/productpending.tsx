@@ -25,6 +25,7 @@ export default function ProductPending() {
   const [data, setData] = React.useState<product[]>([]);
   //const [showForm, setShowForm] = React.useState(false);
   //const [editProduct, setEditProduct] = React.useState<product | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export default function ProductPending() {
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
-        //setLoading(true);
+        setLoading(true);
         const response = await getnotvalidproductforadmin(token);
         if ("error" in response) {
           //setError(response.error);
@@ -45,7 +46,7 @@ export default function ProductPending() {
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -163,7 +164,7 @@ export default function ProductPending() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex justify-end"></div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

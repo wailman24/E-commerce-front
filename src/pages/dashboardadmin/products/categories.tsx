@@ -29,10 +29,13 @@ export default function Categories() {
   const [editCategory, setEditCategory] = React.useState<category | null>(null);
   const [showForm, setShowForm] = React.useState(false);
   const [errors, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true);
+
         const response = await getcategories(token);
         if ("error" in response) {
           setError(response.error);
@@ -47,6 +50,8 @@ export default function Categories() {
       } catch (error) {
         console.error("Failed to fetch categories:", error);
         setError("Failed to fetch categories.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -145,7 +150,7 @@ export default function Categories() {
         </Button>
       </div>
 
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
 
       {showForm && editCategory && (
         <Dialog open={showForm} onOpenChange={(open) => setShowForm(open)}>

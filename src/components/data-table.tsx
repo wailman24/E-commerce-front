@@ -27,6 +27,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { Skeleton } from "../components/ui/skeleton";
 import { ChevronsLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsRightIcon } from "lucide-react";
 
 function DraggableRow<T extends { id: number | undefined }>({ row }: { row: Row<T> }) {
@@ -45,13 +46,19 @@ function DraggableRow<T extends { id: number | undefined }>({ row }: { row: Row<
     </TableRow>
   );
 }
-
 interface DataTableProps<T extends { id: number | undefined }> {
   columns: ColumnDef<T>[];
   data: T[];
+  loading?: boolean;
+  disablePagination?: boolean; // ✅ NEW
 }
 
-export function DataTable<T extends { id: number | undefined }>({ columns, data }: DataTableProps<T>) {
+export function DataTable<T extends { id: number | undefined }>({
+  columns,
+  data,
+  loading = false,
+  disablePagination = false, // ✅ DEFAULT to false
+}: DataTableProps<T>) {
   const [tableData, setTableData] = React.useState<T[]>(data);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
@@ -70,20 +77,20 @@ export function DataTable<T extends { id: number | undefined }>({ columns, data 
     columns,
     state: {
       columnVisibility,
-      pagination,
       globalFilter,
+      ...(disablePagination ? {} : { pagination }), // ✅ apply pagination only if not disabled
     },
     globalFilterFn: (row, columnId, filterValue) => {
       return Object.values(row.original).some((value) => String(value).toLowerCase().includes(filterValue.toLowerCase()));
     },
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
+    ...(disablePagination ? {} : { onPaginationChange: setPagination }), // ✅ only set if not disabled
     getRowId: (row) => row.id!.toString(),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    ...(disablePagination ? {} : { getPaginationRowModel: getPaginationRowModel() }), // ✅ skip pagination if disabled
   });
 
   function handleDragEnd(event: DragEndEvent) {
@@ -125,7 +132,17 @@ export function DataTable<T extends { id: number | undefined }>({ columns, data 
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {loading ? (
+                [...Array(5)].map((_, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {columns.map((_, colIndex) => (
+                      <TableCell key={colIndex}>
+                        <Skeleton className="h-4 w-full rounded" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows?.length ? (
                 <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
                   {table.getRowModel().rows.map((row) => (
                     <DraggableRow key={row.id!} row={row} />
@@ -143,37 +160,39 @@ export function DataTable<T extends { id: number | undefined }>({ columns, data 
         </DndContext>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between px-4 py-4">
-        <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">{table.getFilteredRowModel().rows.length} total row(s)</div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeftIcon />
-          </Button>
-          <Button variant="outline" className="size-8" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            <ChevronLeftIcon />
-          </Button>
-          <div className="px-2 text-sm">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+      {/* Pagination controls only if enabled */}
+      {!disablePagination && (
+        <div className="flex items-center justify-between px-4 py-4">
+          <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">{table.getFilteredRowModel().rows.length} total row(s)</div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronsLeftIcon />
+            </Button>
+            <Button variant="outline" className="size-8" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+              <ChevronLeftIcon />
+            </Button>
+            <div className="px-2 text-sm">
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </div>
+            <Button variant="outline" className="size-8" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+              <ChevronRightIcon />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden size-8 lg:flex"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronsRightIcon />
+            </Button>
           </div>
-          <Button variant="outline" className="size-8" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            <ChevronRightIcon />
-          </Button>
-          <Button
-            variant="outline"
-            className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRightIcon />
-          </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

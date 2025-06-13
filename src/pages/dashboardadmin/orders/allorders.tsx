@@ -24,9 +24,13 @@ export default function AllOrders() {
   const { token } = appContext;
   const [data, setData] = React.useState<order[]>([]);
   // const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
+        setLoading(true);
+
         const response = await getallorders(token);
         if ("error" in response) {
           setData([]);
@@ -35,6 +39,8 @@ export default function AllOrders() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProds();
@@ -86,7 +92,7 @@ export default function AllOrders() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

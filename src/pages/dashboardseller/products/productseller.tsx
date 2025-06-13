@@ -38,10 +38,12 @@ export default function Productseller() {
   const [singleImage, setSingleImage] = React.useState<File | null>(null);
   const [preview, setPreview] = React.useState<string | null>(null);
   const [askNextImage, setAskNextImage] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
-        //setLoading(true);
+        setLoading(true);
         const response = await getsellerproducts(token);
         if ("error" in response) {
           //setError(response.error);
@@ -54,7 +56,7 @@ export default function Productseller() {
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -265,7 +267,7 @@ export default function Productseller() {
           Add Product
         </Button>
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
       {showForm && (
         <Dialog open={showForm} onOpenChange={(open) => setShowForm(open)}>
           <DialogContent className="max-w-md">

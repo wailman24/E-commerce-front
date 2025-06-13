@@ -18,10 +18,14 @@ export default function Sellers() {
 
   const { token } = appContext;
   const [data, setData] = React.useState<seller[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
   //const [error, setError] = React.useState<string | null>(null);
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
+        setLoading(true);
+
         const response = await getallseller(token);
         if ("error" in response) {
           setData([]);
@@ -30,6 +34,8 @@ export default function Sellers() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProds();
@@ -103,7 +109,7 @@ export default function Sellers() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

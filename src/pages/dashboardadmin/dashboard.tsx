@@ -21,10 +21,14 @@ export default function AdminPage() {
 
   const { token } = appContext;
   const [data, setData] = useState<user[]>([]);
+  const [loading, setLoading] = useState(true);
+
   //const [error, setError] = React.useState<string | null>(null);
   useEffect(() => {
     const fetchProds = async () => {
       try {
+        setLoading(true);
+
         const response = await getallusers(token);
         if ("error" in response) {
           setData([]);
@@ -33,6 +37,8 @@ export default function AdminPage() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProds();
@@ -66,7 +72,7 @@ export default function AdminPage() {
                 <ChartAreaInteractive />
               </div>
               {/* <ChartBars /> */}
-              <DataTable columns={columns} data={data} />
+              <DataTable columns={columns} data={data} loading={loading} />
             </div>
           </div>
         </div>

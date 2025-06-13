@@ -61,7 +61,7 @@ const Topbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/best-selling" className="hover:text-green-300">
+              <Link to="/bestselling" className="hover:text-green-300">
                 Best Selling
               </Link>
             </li>

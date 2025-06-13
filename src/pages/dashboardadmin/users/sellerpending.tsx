@@ -15,10 +15,13 @@ export default function PendingSellers() {
   const { token } = appContext;
   const [data, setData] = React.useState<seller[]>([]);
   //const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchSellers = async () => {
       try {
+        setLoading(true);
+
         const response = await getpendingsellers(token);
         if ("error" in response) {
           setData([]);
@@ -27,6 +30,8 @@ export default function PendingSellers() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchSellers();
@@ -140,7 +145,7 @@ export default function PendingSellers() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

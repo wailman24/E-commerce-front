@@ -56,6 +56,7 @@ export function getNavForAdmin(user: user) {
           { title: "All Users", url: "Admin/dashboard/users" },
           { title: "Sellers", url: "Admin/dashboard/allsellers" },
           { title: "Pending Approval", url: "Admin/dashboard/sellers" },
+          { title: "Comments", url: "Admin/dashboard/comments" },
           { title: "Feedbacks", url: "Admin/dashboard/feedbacks" },
         ],
       },

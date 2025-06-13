@@ -21,10 +21,13 @@ export default function AllFbks() {
   const [data, setData] = React.useState<feedback[]>([]);
   const [showForm, setShowForm] = React.useState(false);
   const [editFb, setEditFb] = React.useState<feedback | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchFbks = async () => {
       try {
+        setLoading(true);
+
         const response = await getallfbks(token);
         if ("error" in response) {
           setData([]);
@@ -33,6 +36,8 @@ export default function AllFbks() {
         }
       } catch (error) {
         console.error("Failed to fetch feedback:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchFbks();
@@ -72,7 +77,7 @@ export default function AllFbks() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
 
       {showForm && editFb && (
         <Dialog open={showForm} onOpenChange={setShowForm}>

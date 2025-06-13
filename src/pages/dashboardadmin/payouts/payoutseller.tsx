@@ -14,11 +14,12 @@ export default function SellerPayouts() {
   const { token } = appContext;
   const [data, setData] = React.useState<SellerPayout[]>([]);
   // const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        //setLoading(true);
+        setLoading(true);
         const response = await getPendingPayouts(token!);
         if ("error" in response) {
           //setError(response.error);
@@ -31,7 +32,7 @@ export default function SellerPayouts() {
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -103,7 +104,7 @@ export default function SellerPayouts() {
   return (
     <div className="p-6 space-y-4">
       <h2 className="text-2xl font-semibold">Pending Seller Payouts</h2>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

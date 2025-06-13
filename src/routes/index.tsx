@@ -48,6 +48,7 @@ import AllOrders from "../pages/dashboardadmin/orders/allorders";
 import Items from "../pages/dashboardadmin/orders/items";
 import SellerPayouts from "../pages/dashboardadmin/payouts/payoutseller";
 import AllFbks from "../pages/dashboardadmin/users/feedback";
+import Comments from "../pages/dashboardadmin/users/comments";
 
 function AppRoutes() {
   const appContext = useContext(AppContext);
@@ -114,6 +115,7 @@ function AppRoutes() {
             <Route path="/Admin/dashboard/items-sold" element={<Items />} />
             <Route path="/Admin/dashboard/items-sold/:id" element={<Items />} />
             <Route path="/Admin/dashboard/payouts" element={<SellerPayouts />} />
+            <Route path="/Admin/dashboard/comments" element={<Comments />} />
             <Route path="/Admin/dashboard/feedbacks" element={<AllFbks />} />
           </Route>
         </>

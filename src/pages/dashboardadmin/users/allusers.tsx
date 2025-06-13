@@ -26,18 +26,23 @@ export default function AllUsers() {
   const [data, setData] = React.useState<user[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchProds = async () => {
       try {
+        setLoading(true);
         const response = await getallusers(token);
         if ("error" in response) {
+          setError(response.error);
           setData([]);
         } else {
           setData(response);
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
+        setError("Failed to fetch users." + error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProds();
@@ -102,7 +107,7 @@ export default function AllUsers() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

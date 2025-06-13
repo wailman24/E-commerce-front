@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/button";
 import { getorderitems, item, inc, dec, deleteitem } from "../../services/home/order";
 import { addtowishlist, isexist } from "../../services/home/wishlist";
 import { createPayment, payOnDelivery } from "../../services/home/payment";
-import { updateadressdelivery } from "../../services/home/order"; // ⬅️ you will implement this
+import { updateadressdelivery } from "../../services/home/order";
 
 export default function ShoppingCartPage() {
   const appContext = useContext(AppContext);
@@ -16,10 +16,12 @@ export default function ShoppingCartPage() {
   const [paymentotal, setPaymentotal] = useState<number>();
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [loading, setLoading] = useState(true); // ← Added
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        setLoading(true); // ← Added
         const response = await getorderitems(token);
         if (!response) {
           setItems([]);
@@ -36,6 +38,8 @@ export default function ShoppingCartPage() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false); // ← Added
       }
     };
 
@@ -202,9 +206,12 @@ export default function ShoppingCartPage() {
     }
   };
 
+  if (loading) {
+    return <div className="w-full min-h-[400px] flex justify-center items-center text-lg font-semibold">Loading...</div>;
+  }
+
   return (
     <div className="flex flex-col md:flex-row justify-between gap-8 p-6 md:p-10 relative z-0">
-      {/* Left Section */}
       <div className="w-full md:w-2/3">
         <h2 className="text-3xl font-bold mb-6">Shopping Cart</h2>
         <p className="font-semibold mb-4">
@@ -269,7 +276,6 @@ export default function ShoppingCartPage() {
         </div>
       </div>
 
-      {/* Right Section */}
       <div className="w-full md:w-1/3 mt-8 md:mt-0">
         <div className="bg-white border rounded-md p-6 shadow-md sticky top-24">
           <h4 className="font-bold text-lg mb-4">Order Summary</h4>
@@ -284,7 +290,6 @@ export default function ShoppingCartPage() {
         </div>
       </div>
 
-      {/* Payment Modal */}
       {showPaymentOptions && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[100]">
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm z-[101]">
@@ -304,9 +309,8 @@ export default function ShoppingCartPage() {
                 onClick={async () => {
                   const confirmed = window.confirm("Are you sure you want to choose payment on delivery?");
                   if (confirmed) {
-                    //setShowPaymentOptions(false);
                     await handlePayOnDelivery();
-                    window.location.reload(); // Refresh page
+                    window.location.reload();
                   }
                 }}
               >

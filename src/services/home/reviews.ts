@@ -32,6 +32,29 @@ export async function getreviews(token: string | null, product_id: number): Prom
   }
 }
 
+export async function getallreviews(token: string | null, page = 1): Promise<{ data: review[]; meta: unknown } | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/getallreviews?page=${page}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch reviews." };
+    }
+
+    const json = await res.json();
+    return { data: json.data, meta: json.meta };
+  } catch (error) {
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
 export async function addreview(
   token: string | null,
   product_id: number,

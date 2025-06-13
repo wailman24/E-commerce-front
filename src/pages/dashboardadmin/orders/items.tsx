@@ -26,10 +26,14 @@ export default function Items() {
 
   const { token } = appContext;
   const [data, setData] = React.useState<item[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
   // const [error, setError] = React.useState<string | null>(null);
   React.useEffect(() => {
     const fetchItems = async () => {
       try {
+        setLoading(true);
+
         const response = await getallitems(token);
         console.log("Full items response:", response);
 
@@ -46,6 +50,8 @@ export default function Items() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -99,7 +105,7 @@ export default function Items() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <h2 className="text-xl font-bold">{id ? `Items for Order #${id}` : "All Items"}</h2>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} loading={loading} />
     </div>
   );
 }

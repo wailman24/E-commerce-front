@@ -21,10 +21,12 @@ export default function Page() {
   const { token } = appContext;
   const [data, setData] = useState<product[]>([]);
   //const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchProds = async () => {
       try {
-        //setLoading(true);
+        setLoading(true);
         const response = await getsellerproducts(token);
         if ("error" in response) {
           //setError(response.error);
@@ -37,7 +39,7 @@ export default function Page() {
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -95,7 +97,7 @@ export default function Page() {
                 <ChartAreaInteractive />
               </div>
               {/* <ChartBars /> */}
-              <DataTable columns={columns} data={data} />
+              <DataTable columns={columns} data={data} loading={loading} />
             </div>
           </div>
         </div>
