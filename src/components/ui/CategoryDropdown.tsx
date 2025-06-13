@@ -1,98 +1,58 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState } from "react";
-//import classNames from "classnames";
-
-// Example data with children
-const categories = [
-  {
-    name: "Computers and Laptops",
-
-    children: ["Gaming Laptops", "Business Laptops", "Monitors"],
-  },
-  {
-    name: "Cosmetics and Body Care",
-
-    children: [],
-  },
-  {
-    name: "Accessories",
-
-    children: [],
-  },
-  {
-    name: "Cloths",
-
-    children: [],
-  },
-  {
-    name: "Shoes",
-
-    children: [],
-  },
-  {
-    name: "Gifts",
-    children: [],
-  },
-  {
-    name: "Pet Care",
-    children: [],
-  },
-  {
-    name: "Mobile and Tablets",
-
-    children: ["Android Phones", "Tablets", "iPhones"],
-  },
-  {
-    name: "Music and Gaming",
-
-    children: [],
-  },
-  {
-    name: "Others",
-
-    children: [],
-  },
-];
+import { useContext, useEffect, useState } from "react";
+//import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../Context/AppContext";
+import { category, getcategories } from "../../services/home/category";
 
 const CategoryDropdown = () => {
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [categories, setCategories] = useState<category[]>([]);
+  const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
+  //const navigate = useNavigate();
+  const appContext = useContext(AppContext);
+  if (!appContext) throw new Error("CategoryDropdown must be used within an AppProvider");
+
+  const { token } = appContext;
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const result = await getcategories(token);
+      if (!Array.isArray(result)) {
+        console.error(result.error);
+      } else {
+        setCategories(result);
+      }
+    }
+    fetchCategories();
+  }, [token]);
 
   return (
     <div className="relative group">
       {/* Trigger */}
       <button className="flex items-center gap-2 text-white text-sm font-medium">
-        <span className="flex items-center gap-1">
-          <ChevronDown size={16} />
-          All Categories
-        </span>
+        <ChevronDown size={16} />
+        All Categories
       </button>
 
       {/* Dropdown */}
-      <div className="absolute left-0 top-full w-60 bg-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition z-50">
-        {categories.map((cat, idx) => (
+      <div className="absolute left-0 top-full w-60 bg-white text-black rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition z-50">
+        {categories.map((cat) => (
           <div
-            key={idx}
+            key={cat.id}
             className="relative group/category"
-            onMouseEnter={() => setHoveredCategory(cat.name)}
+            onMouseEnter={() => setHoveredCategory(cat.id)}
             onMouseLeave={() => setHoveredCategory(null)}
           >
             <div className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              {/* <img src={cat.icon} alt="" className="w-5 h-5 mr-2" /> */}
               <span className="text-sm">{cat.name}</span>
-              {cat.children.length > 0 && (
-                <ChevronRight className="ml-auto" size={16} />
-              )}
+              {cat.subcategories && cat.subcategories.length > 0 && <ChevronRight className="ml-auto" size={16} />}
             </div>
 
-            {/* Child dropdown */}
-            {cat.children.length > 0 && hoveredCategory === cat.name && (
-              <div className="absolute left-full top-0 ml-1 w-48 bg-white rounded-md shadow-lg z-50">
-                {cat.children.map((child, i) => (
-                  <div
-                    key={i}
-                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                  >
-                    {child}
+            {/* Subcategories dropdown */}
+            {cat.subcategories && cat.subcategories.length > 0 && hoveredCategory === cat.id && (
+              <div className="absolute left-full top-0 ml-1 w-48 bg-white text-black rounded-md shadow-lg z-50">
+                {cat.subcategories.map((sub) => (
+                  <div key={sub.id} className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                    {sub.name}
                   </div>
                 ))}
               </div>

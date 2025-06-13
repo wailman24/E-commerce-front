@@ -42,8 +42,8 @@ const Topbar = () => {
           Shop<span className="text-black">O</span>
         </Link>
 
-        <input type="text" placeholder="Search Product..." className="w-1/2 px-4 py-2 border rounded-full outline-none" />
-
+        {/*         <input type="text" placeholder="Search Product..." className="w-1/2 px-4 py-2 border rounded-full outline-none" />
+         */}
         <Link to="/becomeseller">
           <button className="bg-black text-white px-4 py-2 rounded-full text-sm">Become Seller</button>
         </Link>
@@ -61,7 +61,7 @@ const Topbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/bestselling" className="hover:text-green-300">
+              <Link to="/best-selling" className="hover:text-green-300">
                 Best Selling
               </Link>
             </li>
