@@ -2,6 +2,15 @@
 import { user } from "@/pages/auth/signup";
 //import { useContext } from "react";
 
+export interface feedback {
+  id: number;
+  user_id?: number;
+  user?: user;
+  email?: string;
+  message?: string;
+  created_at?: string;
+}
+
 export async function RegisterUser(
   data: user
   //setToken: (token: string | null) => void
@@ -218,4 +227,50 @@ export async function getuserbyid(token: string, id: number): Promise<user | { e
   }
 
   return { error: "Invalid response format from server" };
+}
+
+export async function getfbksbyuserid(token: string, id: number): Promise<feedback[] | { error: string }> {
+  const res = await fetch(`http://127.0.0.1:8000/api/getfdbksbyuserid/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Failed to fetch feedback:", text);
+    return { error: `Failed to fetch feedback: ${res.status}` };
+  }
+
+  const json = await res.json();
+
+  if (json && Array.isArray(json.data)) {
+    return json.data as feedback[];
+  }
+
+  return { error: "Invalid response format from server" };
+}
+
+export async function getallfbks(token: string | null): Promise<feedback[] | { error: string }> {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/getallfbks", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch feedbacks." };
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error when getting feedbacks:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
 }

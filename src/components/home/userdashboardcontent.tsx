@@ -3,7 +3,8 @@ import UserProfileDetails from "./userprofile";
 import { seller } from "../../services/home/seller";
 import { user } from "../../pages/auth/signup";
 import OrdersList from "./orderList";
-import UserSettings from "./usersetting";
+//import UserSettings from "./usersetting";
+import UserFeedbackList from "./userfdbx";
 
 type DashboardContentProps = {
   activeTab: string;
@@ -33,7 +34,7 @@ const UserDashboardContent: React.FC<DashboardContentProps> = ({ activeTab, user
       return (
         <div>
           <h2 className="text-2xl font-bold mb-4">Your Comments</h2>
-          <UserSettings />
+          <UserFeedbackList />
         </div>
       );
 

@@ -228,7 +228,7 @@ export default function ShoppingCartPage() {
                   <h3 className="font-semibold text-lg">{item.product.name}</h3>
                   <p className="text-sm text-gray-600 mb-1">{item.product.categorie}</p>
                   <div className="text-sm text-gray-700 flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-yellow-500">{item.product.rating}</span>
+                    <span className="font-semibold text-yellow-500">{item.product.rating?.toFixed(1)}</span>
                     <span className="text-yellow-500">{"★".repeat(Math.round(item.product.rating || 0))}</span>
                     <span className="text-gray-500">({item.product.reviewcount} reviews)</span>
                   </div>

@@ -155,25 +155,29 @@ export async function getallitems(token: string | null): Promise<item[] | { erro
   }
 }
 
-export async function addorderitem(token: string | null, dataitem: { product_id: number }): Promise<item | { error: string }> {
+export async function addorderitem(
+  token: string | null,
+  dataitem: { product_id: number; qte?: number }
+): Promise<item | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/order_item", {
-      method: "post",
+      method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(dataitem),
     });
+
+    const json = await res.json();
+
     if (!res.ok) {
-      const error = await res.json();
-      return { error: error.message || "Failed to fetch orders." };
+      return { error: json.message || "Failed to add item to order." };
     }
 
-    const data = await res.json();
-    return data.data;
+    return json.data;
   } catch (error) {
-    console.error("Error during :", error);
+    console.error("Error during addorderitem:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }

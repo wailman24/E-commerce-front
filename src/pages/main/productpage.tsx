@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../Context/AppContext";
-import { getbestdealsproducts, getproduct, product } from "../../services/home/product";
+import { getcontentbasedproducts, getproduct, product } from "../../services/home/product";
 import ProductDetails from "../../components/home/productabout";
 import PurchaseBox from "../../components/home/purchasebox";
 import RecommendedProducts from "../../components/home/recommendeprod";
@@ -31,7 +31,7 @@ export default function ProductPage() {
 
     const fetchRecommended = async () => {
       try {
-        const rec = await getbestdealsproducts(token);
+        const rec = await getcontentbasedproducts(token, Number(params.id));
         if (!("error" in rec)) {
           setRecommended(rec.slice(0, 4));
         }

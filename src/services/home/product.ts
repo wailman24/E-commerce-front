@@ -60,28 +60,6 @@ export async function getproduct(token: string | null, product_id: number): Prom
   }
 }
 
-export async function getbestdealsproducts(token: string | null): Promise<product[] | { error: string }> {
-  try {
-    const res = await fetch("http://127.0.0.1:8000/api/getBestDealsProducts", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      return { error: error.message || "Failed to fetch best deal products." };
-    }
-
-    const data = await res.json();
-    return data.data;
-  } catch (error) {
-    console.error("Error during process:", error);
-    return { error: "An unexpected error occurred. Please try again later." };
-  }
-}
-
 export async function getallproducts(token: string | null): Promise<product[] | { error: string }> {
   try {
     const res = await fetch("http://127.0.0.1:8000/api/getallproducts", {
@@ -143,6 +121,30 @@ export async function getallvalidproducts(token: string | null, page: number = 1
 
     const data: PaginatedProductResponse = await res.json();
     return data;
+  } catch (error) {
+    console.error("Error during process:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getBestDealsProducts(token: string | null): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/getBestDealsProducts`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    console.log("result: ", data);
+    return data.data as product[];
   } catch (error) {
     console.error("Error during process:", error);
     return { error: "An unexpected error occurred. Please try again later." };
@@ -317,6 +319,93 @@ export async function updateproductstatus(
     return data.DATA;
   } catch (error) {
     console.error("Error during :", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getcontentbasedproducts(token: string | null, product_id: number): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/recommendations/content/${product_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    console.log("content-based data:", data);
+
+    if (Array.isArray(data.data)) {
+      return data.data;
+    } else {
+      return { error: "Invalid products format." };
+    }
+  } catch (error) {
+    console.error("Error during content-based fetch:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getpopularproducts(token: string | null): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/recommendations/popular`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    console.log("popular data:", data);
+
+    if (Array.isArray(data.data)) {
+      return data.data;
+    } else {
+      return { error: "Invalid products format." };
+    }
+  } catch (error) {
+    console.error("Error during popular fetch:", error);
+    return { error: "An unexpected error occurred. Please try again later." };
+  }
+}
+
+export async function getcolaborativeproducts(token: string | null, UserID: number): Promise<product[] | { error: string }> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/recommendations/users/${UserID}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.message || "Failed to fetch products." };
+    }
+
+    const data = await res.json();
+    console.log("collaborative data:", data);
+
+    if (Array.isArray(data.data)) {
+      return data.data;
+    } else {
+      return { error: "Invalid products format." };
+    }
+  } catch (error) {
+    console.error("Error during collaborative fetch:", error);
     return { error: "An unexpected error occurred. Please try again later." };
   }
 }

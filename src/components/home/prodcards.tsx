@@ -6,19 +6,25 @@ import { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../Context/AppContext";
 import { addtowishlist, isexist } from "../../services/home/wishlist";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export default function Prodcards({ id, name, images, prix, total_sold }: product) {
+export default function Prodcards({ id, name, images, prix, total_sold, rating }: product) {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("Products must be used within an AppProvider");
 
-  const { token, setWishlistCount, wishlistCount, setCartCount, cartCount } = appContext;
+  const { token, setWishlistCount, wishlistCount, setCartCount, cartCount, isAuthenticated } = appContext;
 
   const [error, setError] = useState<string | null>(null);
   const [exist, setExist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [cartLoading, setCartLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToCart = async (e: React.FormEvent) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
     e.preventDefault();
     setError("");
     setCartLoading(true);
@@ -45,6 +51,10 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
   };
 
   const handleAddTowishlist = async () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
     setError("");
 
     try {
@@ -123,7 +133,11 @@ export default function Prodcards({ id, name, images, prix, total_sold }: produc
             <p className="font-medium text-sm truncate">{name}</p>
 
             {/* Rating */}
-            <div className="flex text-yellow-500 text-sm">{"★".repeat(0).padEnd(5, "☆")}</div>
+            {/* Rating */}
+            <div className="flex items-center text-sm text-gray-600">
+              <span className="text-yellow-500 mr-1">★ {rating?.toFixed(1) ?? "0.0"}</span>
+              {/* <span>({reviewcount ?? 0} reviews)</span> */}
+            </div>
 
             {/* Pricing */}
             <div className="flex items-center gap-2 text-sm">

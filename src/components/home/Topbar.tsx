@@ -2,28 +2,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { HeartIcon, User, ShoppingCartIcon } from "lucide-react";
 import { useContext, useState, useRef, useEffect } from "react";
 import { AppContext } from "../../Context/AppContext";
-import { onMessage, getToken } from "firebase/messaging";
-import { messaging } from "../../services/home/firebase";
-import { requestFCMToken } from "../../services/configuration/requestFCMToken";
+
 import CategoryDropdown from "../ui/CategoryDropdown";
-
-import { ref, onChildAdded } from "firebase/database";
-import { database } from "../../services/home/firebase"; // Adjust path if needed
-
-type NotificationData = {
-  title: string;
-  message?: string;
-};
 
 const Topbar = () => {
   const appContext = useContext(AppContext);
   const navigate = useNavigate();
   if (!appContext) throw new Error("Topbar must be used within an AppProvider");
 
-  const { token, wishlistCount, cartCount, user, logout } = appContext;
+  const { wishlistCount, cartCount, user, logout } = appContext;
 
   const [showDropdown, setShowDropdown] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  // const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Hide dropdown when clicking outside
@@ -38,55 +28,6 @@ const Topbar = () => {
   }, []);
 
   // Setup FCM + Firebase DB notifications for Admin
-  useEffect(() => {
-    if (!user || user.role !== "Admin") return;
-
-    // 1. Register FCM Token
-    const setupFCM = async () => {
-      try {
-        const fcmtoken = await getToken(messaging, {
-          vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-        });
-        if (fcmtoken && token) {
-          await requestFCMToken(fcmtoken, token);
-          console.log("✅ FCM token registered.");
-        } else {
-          console.warn("⚠️ Missing FCM or auth token.");
-        }
-      } catch (err) {
-        console.error("❌ FCM permission or token error:", err);
-      }
-    };
-
-    setupFCM();
-
-    // 2. Handle foreground FCM messages
-    const unsubscribeFCM = onMessage(messaging, (payload) => {
-      console.log("🔥 Foreground message received:", payload);
-      const notif: NotificationData = {
-        title: payload.notification?.title || "Notification",
-        message: payload.notification?.body || "",
-      };
-      setNotifications((prev) => [notif, ...prev]);
-    });
-    //console.log("🔥 Foreground message received:", payload);
-
-    // 3. Listen to new notifications from Firebase Realtime DB
-    const notifRef = ref(database, "notifications");
-    onChildAdded(notifRef, (snapshot) => {
-      const data = snapshot.val();
-      const realtimeNotif: NotificationData = {
-        title: data.title || "New Event",
-        message: data.message || "",
-      };
-      setNotifications((prev) => [realtimeNotif, ...prev]);
-    });
-
-    return () => {
-      // Firebase `onChildAdded` has no unsubscribe function, but we clean up FCM listener
-      unsubscribeFCM();
-    };
-  }, [user, token]);
 
   const handleLogout = () => {
     logout();
@@ -120,7 +61,7 @@ const Topbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/best-selling" className="hover:text-green-300">
+              <Link to="/bestselling" className="hover:text-green-300">
                 Best Selling
               </Link>
             </li>
@@ -190,18 +131,7 @@ const Topbar = () => {
                 <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100">
                   ⚙️ Settings
                 </Link>
-                <div className="border-t my-2" />
-                <div className="px-4 py-2 font-semibold text-sm text-gray-700">🔔 Announcements</div>
-                {notifications.length === 0 ? (
-                  <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
-                ) : (
-                  notifications.slice(0, 5).map((notif, index) => (
-                    <div key={index} className="px-4 py-2 text-sm hover:bg-gray-100">
-                      <div className="font-medium">{notif.title}</div>
-                      {notif.message && <div className="text-xs text-gray-500">{notif.message}</div>}
-                    </div>
-                  ))
-                )}
+
                 <div className="border-t my-2" />
                 <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100">
                   🚪 Logout

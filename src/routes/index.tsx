@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AppContext } from "../Context/AppContext";
 
@@ -11,15 +11,21 @@ import MainLayout from "../layouts/MainLayout";
 import SellerLayout from "../layouts/SellerLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-// Main Pages
+// Public & Shared Pages
 import Home from "../pages/main/home";
 import Products from "../pages/main/products";
+import ProductPage from "../pages/main/productpage";
+import BecomeSeller from "../pages/main/becomeseller";
 import ShoppingCartPage from "../pages/main/shoppingcarts";
 import Wishlist from "../pages/main/wishlist";
-import BecomeSeller from "../pages/main/becomeseller";
-import ProductPage from "../pages/main/productpage";
+import FeedbackForm from "../pages/main/faq";
+import Bestselling from "../pages/main/bestselling";
+
+// User Pages
 import UserDashboardPage from "../pages/main/user/dahboarduser";
 import UserSettings from "../components/home/usersetting";
+import PaymentCancel from "../pages/main/payment/paymentcancel";
+import PaymentSuccess from "../pages/main/payment/paymentsuccess";
 
 // Seller Pages
 import Page from "../pages/dashboardseller/dashboard";
@@ -27,6 +33,7 @@ import ProductAddForm from "../pages/dashboardseller/products/addproduct";
 import Productseller from "../pages/dashboardseller/products/productseller";
 import NotvalidProductseller from "../pages/dashboardseller/products/notvalidprod";
 import Orderseller from "../pages/dashboardseller/orders/sellerorders";
+import Payouts from "../pages/dashboardseller/finance/payouts";
 
 // Admin Pages
 import AdminPage from "../pages/dashboardadmin/dashboard";
@@ -40,52 +47,50 @@ import Categories from "../pages/dashboardadmin/products/categories";
 import AllOrders from "../pages/dashboardadmin/orders/allorders";
 import Items from "../pages/dashboardadmin/orders/items";
 import SellerPayouts from "../pages/dashboardadmin/payouts/payoutseller";
-import Payouts from "../pages/dashboardseller/finance/payouts";
-import PaymentCancel from "../pages/main/payment/paymentcancel";
-import PaymentSuccess from "../pages/main/payment/paymentsuccess";
-import FeedbackForm from "../pages/main/faq";
+import AllFbks from "../pages/dashboardadmin/users/feedback";
 
 function AppRoutes() {
   const appContext = useContext(AppContext);
-
-  if (!appContext) {
-    throw new Error("AppRoutes must be used within an AppProvider");
-  }
+  if (!appContext) throw new Error("AppRoutes must be used within an AppProvider");
 
   const { isAuthenticated } = appContext;
 
   return (
     <Routes>
+      {/* Auth Routes (only visible when NOT authenticated) */}
       {!isAuthenticated && (
         <>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
         </>
       )}
 
-      {isAuthenticated && (
+      {/* Public routes (for all) */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/product/about/:id" element={<ProductPage />} />
+        <Route path="/bestselling" element={<Bestselling />} />
+      </Route>
+
+      {/* Protected Routes */}
+      {isAuthenticated ? (
         <>
-          {/* Main Layout */}
+          {/* Main authenticated user routes */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/products" element={<Products />} />
             <Route path="/cart" element={<ShoppingCartPage />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/becomeseller" element={<BecomeSeller />} />
-            <Route path="/product/about/:id" element={<ProductPage />} />
             <Route path="/user/about" element={<UserDashboardPage />} />
             <Route path="/user/about/:id" element={<UserDashboardPage />} />
             <Route path="/user/settings" element={<UserSettings />} />
-            <Route path="/payment/cancel" element={<PaymentCancel />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
             <Route path="/FAQ" element={<FeedbackForm />} />
-            {/* Nested routes for user dashboard */}
-            <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>
 
-          {/* Seller Layout */}
+          {/* Seller routes */}
           <Route element={<SellerLayout />}>
             <Route path="/dash" element={<Page />} />
             <Route path="/product/add" element={<ProductAddForm />} />
@@ -95,7 +100,7 @@ function AppRoutes() {
             <Route path="/dashboard/finance" element={<Payouts />} />
           </Route>
 
-          {/* Admin Layout */}
+          {/* Admin routes */}
           <Route element={<AdminLayout />}>
             <Route path="/admindash" element={<AdminPage />} />
             <Route path="/Admin/dashboard/users" element={<AllUsers />} />
@@ -109,8 +114,12 @@ function AppRoutes() {
             <Route path="/Admin/dashboard/items-sold" element={<Items />} />
             <Route path="/Admin/dashboard/items-sold/:id" element={<Items />} />
             <Route path="/Admin/dashboard/payouts" element={<SellerPayouts />} />
+            <Route path="/Admin/dashboard/feedbacks" element={<AllFbks />} />
           </Route>
         </>
+      ) : (
+        // Redirect any unknown or protected route to login
+        <Route path="*" element={<Navigate to="/login" replace />} />
       )}
     </Routes>
   );

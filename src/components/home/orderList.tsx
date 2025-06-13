@@ -9,14 +9,15 @@ const OrdersList: React.FC = () => {
   const appContext = useContext(AppContext);
   if (!appContext) throw new Error("AppContext must be used within an AppProvider");
 
-  const { token } = appContext;
+  const { token, user } = appContext;
   const [orders, setOrders] = useState<order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { id } = useParams();
+  const userid = id ? Number(id) : user!.id;
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await order_history(token, Number(id));
+        const response = await order_history(token, Number(userid));
         if ("error" in response) {
           setOrders([]);
         } else {
@@ -30,7 +31,7 @@ const OrdersList: React.FC = () => {
     };
 
     fetchOrders();
-  }, [token, id]);
+  }, [token, userid]);
 
   if (loading) {
     return <p className="text-gray-500 text-sm">Loading your orders...</p>;

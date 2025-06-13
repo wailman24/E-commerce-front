@@ -7,15 +7,10 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AppContext } from "../../Context/AppContext";
 import { useContext, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps extends React.ComponentProps<"div"> {
   handlelogin: (
@@ -28,6 +23,8 @@ export function LoginForm({ handlelogin }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const appContext = useContext(AppContext); // Handle null case properly
+  const navigate = useNavigate();
+
   // Ensure setToken is available
   if (!appContext) {
     throw new Error("SignupForm must be used within an AppProvider");
@@ -44,6 +41,7 @@ export function LoginForm({ handlelogin }: LoginFormProps) {
         setError(result.error); // Set error message
       } else {
         console.log("Login successful", result);
+        navigate("/home", { replace: true });
 
         // Redirect or perform any success action
       }
@@ -58,9 +56,7 @@ export function LoginForm({ handlelogin }: LoginFormProps) {
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -79,20 +75,11 @@ export function LoginForm({ handlelogin }: LoginFormProps) {
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
+                  <a href="#" className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
                     Forgot your password?
                   </a>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               {error && (
                 <Alert variant="destructive">
@@ -114,6 +101,10 @@ export function LoginForm({ handlelogin }: LoginFormProps) {
               Don&apos;t have an account?{" "}
               <Link to="/signup" className="underline underline-offset-4">
                 Sign up
+              </Link>{" "}
+              or{" "}
+              <Link to="/home" className="underline underline-offset-4">
+                continue as guest
               </Link>
             </div>
           </form>
