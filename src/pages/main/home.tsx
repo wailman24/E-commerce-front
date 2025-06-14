@@ -1,41 +1,83 @@
-//import React from "react";
-import { Eye, ShoppingCart, Heart } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useContext, useEffect, useState } from "react";
-import { getbestdealsproducts, product } from "../../services/home/product";
+import { getcolaborativeproducts, getpopularproducts, product } from "../../services/home/product";
 import { AppContext } from "../../Context/AppContext";
+import { category, popularecatego } from "../../services/home/category";
+import Prodcards from "../../components/home/prodcards";
+import { Skeleton } from "../../components/ui/skeleton";
 
 export default function HomePage() {
   const appContext = useContext(AppContext);
-  if (!appContext) {
-    throw new Error("SignupForm must be used within an AppProvider");
-  }
-  const { token } = appContext;
+  if (!appContext) throw new Error("HomePage must be used within an AppProvider");
 
-  const [bdproducts, setBDProducts] = useState<product[]>([]);
+  const { token, user } = appContext;
+
+  const [popularProducts, setPopularProducts] = useState<product[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<product[]>([]);
+  const [categories, setCategories] = useState<category[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadingPopular, setLoadingPopular] = useState<boolean>(true);
+  const [loadingRecommended, setLoadingRecommended] = useState<boolean>(true);
 
+  // Fetch popular categories
   useEffect(() => {
-    const fetchBDP = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await getbestdealsproducts(token);
-        //console.log("Fetched User Data:", user);
-        if ("error" in response) {
-          setError(response.error);
-
-          setBDProducts([]);
+        const response = await popularecatego(token);
+        if (response && "error" in response) {
+          setCategories([]);
         } else {
-          setBDProducts(response);
-          console.log(response);
-          setError(null);
+          setCategories(response);
         }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+      } catch (err) {
+        console.error("Error loading popular categories", err);
       }
     };
-
-    fetchBDP();
+    fetchCategories();
   }, [token]);
+
+  // Fetch popular products
+  useEffect(() => {
+    const fetchPopularProducts = async () => {
+      setLoadingPopular(true);
+      try {
+        const response = await getpopularproducts(token);
+        if ("error" in response) {
+          setError(response.error);
+          setPopularProducts([]);
+        } else if (Array.isArray(response)) {
+          setPopularProducts(response.slice(0, 5));
+        }
+      } catch {
+        setError("Server error");
+      } finally {
+        setLoadingPopular(false);
+      }
+    };
+    fetchPopularProducts();
+  }, [token]);
+
+  // Fetch collaborative recommendations
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const fetchRecommended = async () => {
+      setLoadingRecommended(true);
+      try {
+        const response = await getcolaborativeproducts(token, user.id);
+        if ("error" in response) {
+          setRecommendedProducts([]);
+        } else if (Array.isArray(response)) {
+          setRecommendedProducts(response.slice(0, 5));
+        }
+      } catch {
+        setError("Server error");
+      } finally {
+        setLoadingRecommended(false);
+      }
+    };
+    fetchRecommended();
+  }, [token, user]);
 
   return (
     <div className="space-y-16">
@@ -46,92 +88,146 @@ export default function HomePage() {
         <Button className="text-lg px-8 py-4">Shop Now</Button>
       </section>
 
-      {/* Features Section */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 px-6">
-        <div className="bg-white shadow rounded-2xl p-4 text-center">
-          <p className="font-semibold">Fast Shipping</p>
-        </div>
-        <div className="bg-white shadow rounded-2xl p-4 text-center">
-          <p className="font-semibold">Best Offers</p>
-        </div>
-        <div className="bg-white shadow rounded-2xl p-4 text-center">
-          <p className="font-semibold">Secure Payments</p>
-        </div>
-        <div className="bg-white shadow rounded-2xl p-4 text-center">
-          <p className="font-semibold">24/7 Support</p>
-        </div>
-      </section>
-
-      {/* Popular Categories Section */}
+      {/* Features */}
       <section className="px-6">
-        <h2 className="text-2xl font-bold mb-4">Popular Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-100 rounded-2xl p-4 text-center">
-            <p className="font-medium">Smartphones</p>
-          </div>
-          <div className="bg-gray-100 rounded-2xl p-4 text-center">
-            <p className="font-medium">Laptops</p>
-          </div>
-          <div className="bg-gray-100 rounded-2xl p-4 text-center">
-            <p className="font-medium">Accessories</p>
-          </div>
-          <div className="bg-gray-100 rounded-2xl p-4 text-center">
-            <p className="font-medium">Gaming</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Best Deals */}
-      <section className="px-6 py-4">
-        <h2 className="text-2xl font-bold mb-6">Best Deals {error && `- ${error}`}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {bdproducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden text-left">
-              {/* Product Image with Actions */}
-              <div className="relative w-full h-40">
-                {product.images?.[0]?.image_url && (
-                  <img
-                    src={`http://127.0.0.1:8000/storage/${product.images[0].image_url}`}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                <div className="absolute top-2 right-2 flex flex-col gap-2">
-                  <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
-                    <Heart className="w-4 h-4 text-gray-700" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="bg-white rounded-full shadow w-8 h-8">
-                    <Eye className="w-4 h-4 text-gray-700" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Product Details */}
-              <div className="p-3 space-y-1">
-                <p className="text-xs text-blue-600">{"Brand Ltd"}</p>
-                <p className="font-medium text-sm truncate">{product.name}</p>
-
-                {/* Rating */}
-                <div className="flex text-yellow-500 text-sm">{"★".repeat(0).padEnd(5, "☆")}</div>
-
-                {/* Pricing */}
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-semibold">{product.prix} DZD</span>
-                  {product.prix && <span className="line-through text-gray-400 text-xs">{product.prix} DZD</span>}
-                </div>
-
-                {/* Sold Count */}
-                <p className="text-green-600 text-xs">{product.total_sold || 0} sold</p>
-
-                {/* Add to Cart */}
-                <Button variant="outline" className="w-full mt-2 text-sm flex items-center justify-center gap-2">
-                  <ShoppingCart className="w-4 h-4" /> Add to Cart
-                </Button>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { icon: "🚚", title: "Fast Shipping", description: "Get your orders quickly anywhere in Algeria." },
+            { icon: "💰", title: "Best Offers", description: "Exclusive deals on top electronics." },
+            { icon: "🔒", title: "Secure Payments", description: "Your transactions are safe and encrypted." },
+            { icon: "📞", title: "24/7 Support", description: "We’re here to help anytime, any day." },
+          ].map((f) => (
+            <div
+              key={f.title}
+              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition p-6 text-center flex flex-col items-center gap-2"
+            >
+              <div className="text-4xl">{f.icon}</div>
+              <h3 className="font-semibold text-lg">{f.title}</h3>
+              <p className="text-sm text-gray-600">{f.description}</p>
             </div>
           ))}
         </div>
       </section>
+
+      {/* Categories */}
+      <section className="px-6">
+        <h2 className="text-2xl font-bold mb-6">Popular Categories</h2>
+        <div className="flex flex-wrap gap-4">
+          {categories.length > 0 ? (
+            categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-gray-100 rounded-2xl p-6 h-32 text-center flex flex-col justify-center items-center shadow hover:shadow-md min-w-[180px] flex-1"
+              >
+                <p className="text-lg font-semibold">{cat.name}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500 w-full text-center">No data available.</p>
+          )}
+        </div>
+      </section>
+
+      {/* Popular Products */}
+      <section className="px-6 py-4">
+        <h2 className="text-2xl font-bold mb-6">Best Deals</h2>
+        {loadingPopular ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-64 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : popularProducts.length === 0 ? (
+          <p className="text-center text-gray-500">No products available.</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {popularProducts.map((p) => (
+              <Prodcards key={p.id} {...p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Personalized Products */}
+      <section className="px-6 py-4">
+        <h2 className="text-2xl font-bold mb-6">For You</h2>
+        {loadingRecommended ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-64 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : recommendedProducts.length === 0 ? (
+          <p className="text-center text-gray-500">No personalized recommendations available.</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {recommendedProducts.map((p) => (
+              <Prodcards key={p.id} {...p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-300 px-6 py-12 mt-20">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">About Us</h3>
+            <p className="text-sm">
+              We are a leading Algerian e-commerce platform providing the best deals on electronics. Fast delivery, secure payment, and top
+              customer service — that’s our promise.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">Quick Links</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="/shop" className="hover:text-white">
+                  Shop
+                </a>
+              </li>
+              <li>
+                <a href="/categories" className="hover:text-white">
+                  Categories
+                </a>
+              </li>
+              <li>
+                <a href="/deals" className="hover:text-white">
+                  Best Deals
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="hover:text-white">
+                  Contact Us
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">Contact</h3>
+            <p className="text-sm">Email: support@yourstore.dz</p>
+            <p className="text-sm">Phone: +213 123 456 789</p>
+            <p className="text-sm">Algiers, Algeria</p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-white">Follow Us</h3>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-white">
+                Facebook
+              </a>
+              <a href="#" className="hover:text-white">
+                Instagram
+              </a>
+              <a href="#" className="hover:text-white">
+                Twitter
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="text-center text-sm mt-12 border-t border-gray-700 pt-6">
+          &copy; {new Date().getFullYear()} Shop. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }

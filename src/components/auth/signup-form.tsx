@@ -1,54 +1,53 @@
-//import { VerifyOtp } from "../../services/Auth/auth";
-import { user } from "@/pages/auth/signup";
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AppContext } from "../../Context/AppContext";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import Otpverification from "../../components/auth/verity-otp";
-//import { toast } from "react-toastify";
-//import "react-toastify/dist/ReactToastify.css";
+import { user } from "../../pages/auth/signup";
+import { seller } from "../../services/home/seller";
 
 interface SignupFormProps extends React.ComponentProps<"div"> {
-  handleregister: (
-    data: user
-    // setToken: (token: string | null) => void
-  ) => Promise<{ error?: string }>;
+  handleregister: (data: user) => Promise<{ error?: string }>;
 }
 
 export function SignupForm({ handleregister }: SignupFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-
   const [success, setSuccess] = useState(false);
-  const appContext = useContext(AppContext); // Handle null case properly
-  // Ensure setToken is available
+
+  const appContext = useContext(AppContext);
   if (!appContext) {
     throw new Error("SignupForm must be used within an AppProvider");
   }
-  //const { setToken } = appContext;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Reset previous error
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
     try {
-      const result = await handleregister({ name, email, password });
+      const result = await handleregister({
+        name,
+        email,
+        password,
+        id: 0,
+        seller: {} as seller,
+      });
 
       if (result?.error) {
-        setError(result.error); // Set error message
+        setError(result.error);
       } else {
         setSuccess(true);
         console.log("Register successful", result);
@@ -61,29 +60,19 @@ export function SignupForm({ handleregister }: SignupFormProps) {
 
   const closeOtp = () => setSuccess(false);
 
-  //const navigate = useNavigate();
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Crate new account</CardTitle>
-          <CardDescription>
-            Enter your name and email to create a new account
-          </CardDescription>
+          <CardTitle>Create new account</CardTitle>
+          <CardDescription>Enter your name and email to create a new account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="m batata"
-                  required
-                />
+                <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="mohamed " required />
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
@@ -92,25 +81,21 @@ export function SignupForm({ handleregister }: SignupFormProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="m@example.com"
+                  placeholder="ex@example.com"
                   required
                 />
               </div>
               <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  {/*  <a
-                                        href="#"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </a> */}
-                </div>
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
-                  id="password"
+                  id="confirmPassword"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
               </div>
@@ -124,16 +109,10 @@ export function SignupForm({ handleregister }: SignupFormProps) {
               {success && (
                 <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
                   <div className="w-full max-w-md">
-                    <Otpverification
-                      name={name}
-                      email={email}
-                      password={password}
-                      closeOtp={closeOtp}
-                    />
+                    <Otpverification name={name} email={email} password={password} closeOtp={closeOtp} id={0} seller={{} as seller} />
                   </div>
                 </div>
               )}
-              {/*    */}
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
                   Register
@@ -141,7 +120,7 @@ export function SignupForm({ handleregister }: SignupFormProps) {
               </div>
             </div>
             <div className="mt-4 text-center text-sm">
-              you have an account?{" "}
+              Already have an account?{" "}
               <Link to="/login" className="underline underline-offset-4">
                 Login
               </Link>

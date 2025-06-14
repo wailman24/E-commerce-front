@@ -4,6 +4,8 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { getuser } from "../services/Auth/auth";
 import { getwishlist } from "../services/home/wishlist";
 import { getorderitems } from "../services/home/order";
+//import { requestFCMToken } from "../services/configuration/requestFCMToken";
+
 interface AppContextType {
   user: user | null;
   token: string | null;
@@ -12,60 +14,77 @@ interface AppContextType {
   setWishlistCount: (wishlistCount: number) => void;
   cartCount: number;
   setCartCount: (cartCount: number) => void;
-  //setUser: (user: string) => void;
+  logout: () => void;
+  isAuthenticated: boolean;
 }
+
 export const AppContext = createContext<AppContextType | null>(null);
 
 export default function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<user | null>({
-    name: "",
-    email: "",
-    password: "",
-    role: "",
-  });
+  const [user, setUser] = useState<user | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [wishlistCount, setWishlistCount] = useState<number>(0);
   const [cartCount, setCartCount] = useState(0);
-  //getuser(token);
+
+  const isAuthenticated = !!token;
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    setToken(null);
+  };
 
   useEffect(() => {
-    const fetchuser = async () => {
-      if (token) {
-        try {
-          const response = await getuser(token);
-          //console.log("Fetched User Data:", user);
-          if (response?.data) {
-            setUser(response.data); // Extract the actual user object
-          } else {
-            setUser(null);
-          }
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
+    const fetchUser = async () => {
+      if (!token) return setUser(null);
+
+      try {
+        const response = await getuser(token);
+        if (response?.data) {
+          setUser(response.data);
+          //await requestFCMToken(response.data.id, token);
+        } else {
           setUser(null);
-          setToken(null); // Clear token if fetch fails
         }
-      } else {
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
         setUser(null);
+        setToken(null);
       }
     };
 
-    fetchuser();
+    fetchUser();
   }, [token]);
 
   useEffect(() => {
     const fetchCounts = async () => {
-      const wishlist = await getwishlist(token);
+      if (!token || !user) return;
 
+      const wishlist = await getwishlist(token);
       if (!("error" in wishlist)) setWishlistCount(wishlist.length);
 
       const cart = await getorderitems(token);
       if (cart && !("error" in cart)) setCartCount(cart.length);
+      else setCartCount(0);
     };
 
     fetchCounts();
-  }, [token]);
+  }, [token, user]);
+
   return (
-    <AppContext.Provider value={{ token, setToken, user, wishlistCount, setWishlistCount, cartCount, setCartCount }}>
+    <AppContext.Provider
+      value={{
+        token,
+        setToken,
+        user,
+        wishlistCount,
+        setWishlistCount,
+        cartCount,
+        setCartCount,
+        logout,
+        isAuthenticated,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

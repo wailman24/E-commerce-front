@@ -1,16 +1,92 @@
-import { AppSidebar } from "../../components/app-sidebar";
-import { ChartAreaInteractive } from "../../components/chart-area-interactive";
-import { DataTable } from "../../components/data-table";
 import { SectionCards } from "../../components/section-cards";
+//import { AppSidebar } from "../../components/app-sidebar";
+import { ChartAreaInteractive } from "../../components/chart-area-interactive";
+//import { DataTable } from "../../components/data-table";
+
 import { SiteHeader } from "../../components/site-header";
 import { SidebarInset, SidebarProvider } from "../../components/ui/sidebar";
+//import { ChartBars } from "../../components/chart-bars";
+import { AppContext } from "../../Context/AppContext";
+import { useContext, useEffect, useState } from "react";
+import { DataTable } from "../../components/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { getsellerproducts, product } from "../../services/home/product";
 
-import data from "./data.json";
+//import data from "./data.json";
 
 export default function Page() {
+  const appContext = useContext(AppContext);
+  if (!appContext) throw new Error("Products must be used within an AppProvider");
+
+  const { token } = appContext;
+  const [data, setData] = useState<product[]>([]);
+  //const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProds = async () => {
+      try {
+        setLoading(true);
+        const response = await getsellerproducts(token);
+        if ("error" in response) {
+          //setError(response.error);
+          setData([]);
+        } else {
+          setData(response);
+          console.log(response);
+          //setError(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProds();
+  }, [token]);
+
+  const columns: ColumnDef<product>[] = [
+    {
+      id: "drag",
+      header: () => null,
+      //cell: ({ row }) => <span>::</span>,
+    },
+    {
+      accessorKey: "name",
+      header: "Product Name",
+      cell: ({ row }) => {
+        const name: string = row.original.name || "";
+        const words = name.split(" ");
+        const truncated = words.slice(0, 4).join(" ");
+        return (
+          <span title={name}>
+            {truncated}
+            {words.length > 4 ? "..." : ""}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "prix",
+      header: "Price",
+    },
+    {
+      accessorKey: "stock",
+      header: "Stock",
+    },
+    {
+      accessorKey: "is_valid",
+      header: "Status",
+    },
+    {
+      accessorKey: "total_sold",
+      header: "Sold",
+    },
+  ];
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" />
+      {/* <AppSidebar variant="inset" /> */}
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
@@ -20,7 +96,8 @@ export default function Page() {
               <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />
               </div>
-              <DataTable data={data} />
+              {/* <ChartBars /> */}
+              <DataTable columns={columns} data={data} loading={loading} />
             </div>
           </div>
         </div>

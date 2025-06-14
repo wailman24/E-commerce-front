@@ -28,6 +28,7 @@ export default function BecomeSeller() {
       adress,
       paypal,
       logo,
+      id: 0,
     };
 
     try {

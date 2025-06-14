@@ -1,13 +1,16 @@
 //import React from 'react'
+import { seller } from "@/services/home/seller";
 import { SignupForm } from "../../components/auth/signup-form";
 import { RegisterUser } from "../../services/Auth/auth";
 
 export interface user {
-  id?: number;
+  id: number;
   name: string;
   email: string;
-  password: string;
+  password?: string;
+  seller: seller;
   role?: string;
+  role_id?: number;
 }
 function Signup() {
   return (
