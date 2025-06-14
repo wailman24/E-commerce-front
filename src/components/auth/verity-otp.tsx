@@ -85,7 +85,7 @@ function InputOTPForm({ name, email, password, closeOtp }: user & { closeOtp: ()
       <Card>
         <CardHeader>
           <CardTitle>OTP Verification</CardTitle>
-          <CardDescription>Enter the one-time password sent to your phone.</CardDescription>
+          <CardDescription>Enter the one-time password sent to your email.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

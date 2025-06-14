@@ -49,6 +49,7 @@ import Items from "../pages/dashboardadmin/orders/items";
 import SellerPayouts from "../pages/dashboardadmin/payouts/payoutseller";
 import AllFbks from "../pages/dashboardadmin/users/feedback";
 import Comments from "../pages/dashboardadmin/users/comments";
+import Reset from "../pages/main/reset-password";
 
 function AppRoutes() {
   const appContext = useContext(AppContext);
@@ -65,6 +66,7 @@ function AppRoutes() {
           <Route path="/signup" element={<Signup />} />
         </>
       )}
+      <Route path="/reset-password" element={<Reset />} />
 
       {/* Public routes (for all) */}
       <Route element={<MainLayout />}>
