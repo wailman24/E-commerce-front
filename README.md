@@ -1,54 +1,82 @@
-# React + TypeScript + Vite
+# E-commerce Front
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive e-commerce frontend for an Algerian marketplace, providing the best deals on electronics with fast delivery, secure payment, and top customer service.
 
-Currently, two official plugins are available:
+> **Backend Link:**  
+> The backend powering this frontend can be found here: [wailman24/E-commerce-api](https://github.com/wailman24/E-commerce-api)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Product browsing and detail pages
+- Shopping cart with quantity management and removal
+- Wish list support
+- Secure checkout with delivery address and payment options (online and pay-on-delivery)
+- Product reviews and ratings
+- Seller dashboard for managing products
+- Filtering and searching for products by price, rating, and category
+- Responsive UI, optimized for mobile and desktop
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **React** + **TypeScript**
+- **React Context API** for global state management
+- **React Router** for navigation
+- Custom UI components
+- API integration for product, order, wishlist, and payment management
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 16 or higher recommended)
+- npm or yarn
+
+### Installation
+
+```bash
+git clone https://github.com/wailman24/E-commerce-front.git
+cd E-commerce-front
+npm install
+# or
+yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Running the Project
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm start
+# or
+yarn start
 ```
+
+The app will be available at `http://localhost:3000`.
+
+### Build
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+## Project Structure
+
+- `src/pages/main/` — Main user-facing pages (home, products, product detail, cart, etc)
+- `src/pages/dashboardseller/` — Seller dashboard
+- `src/components/` — UI and reusable components
+- `src/services/` — API service files for products, orders, wishlist, payment, etc.
+- `src/Context/` — App-wide context (global state)
+
+## About
+
+We are a leading Algerian e-commerce platform providing the best deals on electronics. Fast delivery, secure payment, and top customer service — that’s our promise.
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](LICENSE)
+
+---
