@@ -77,6 +77,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## License
 
-[MIT](LICENSE)
+This project is licensed for **personal, educational, or non-commercial use only**. See the [LICENSE](LICENSE) file for details.
+
 
 ---
